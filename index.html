@@ -31,7 +31,7 @@
       #app { padding: 12px 16px 60px; }
     }
     @media (hover: none) {
-      button:not(.item-del):not(.btn-tag-edit):not(.btn-title-edit) {
+      button:not(.item-del):not(.btn-tag-edit):not(.btn-title-edit):not(.btn-title-done):not(.btn-tag-save) {
         min-height: 44px;
         display: inline-flex;
         align-items: center;
@@ -262,6 +262,23 @@
       transition: background 0.1s, color 0.1s;
     }
     .btn-title-edit:hover { background: rgba(55,53,47,0.08); color: #37352f; }
+    .btn-title-done {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 13px;
+      color: rgba(55,53,47,0.4);
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 3px;
+      transition: background 0.1s, color 0.1s;
+    }
+    .btn-title-done:hover { background: rgba(55,53,47,0.08); color: #37352f; }
 
     .item-btns {
       display: flex;
@@ -502,19 +519,23 @@
       width: 160px;
     }
 
-    .btn-tag-save, .btn-tag-cancel {
+    .btn-tag-save {
       background: none;
       border: none;
       cursor: pointer;
-      font-size: 11px;
-      font-family: inherit;
-      padding: 2px 6px;
+      font-size: 13px;
+      color: rgba(55,53,47,0.4);
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       border-radius: 3px;
-      color: rgba(55,53,47,0.5);
       transition: background 0.1s, color 0.1s;
     }
-    .btn-tag-save:hover   { background: rgba(55,53,47,0.08); color: #37352f; }
-    .btn-tag-cancel:hover { background: rgba(55,53,47,0.08); color: #37352f; }
+    .btn-tag-save:hover { background: rgba(55,53,47,0.08); color: #37352f; }
 
     .add-tags-input {
       flex: 1;
@@ -940,8 +961,7 @@ function itemHTML(item) {
          <input id="tagedit-${item.id}" class="tag-edit-input"
                 value="${esc(item.tags.join(', '))}" placeholder="tag1, tag2"
                 onkeydown="if(event.key==='Enter')setTags('${item.id}',this.value);if(event.key==='Escape')cancelTagEdit()">
-         <button class="btn-tag-save"   onclick="setTags('${item.id}',document.getElementById('tagedit-${item.id}').value)">save</button>
-         <button class="btn-tag-cancel" onclick="cancelTagEdit()">cancel</button>
+         <button class="btn-tag-save" onmousedown="event.preventDefault()" onclick="setTags('${item.id}',document.getElementById('tagedit-${item.id}').value)">✓</button>
        </div>`
     : `<div class="item-tags">
          ${item.tags.map(t => `<span class="item-tag${activeTag===t?' active':''}">${esc(t)}</span>`).join('')}
@@ -958,7 +978,7 @@ function itemHTML(item) {
       ${editingTitleFor === item.id
         ? `<div class="item-title-wrap"><span id="titleedit-${item.id}" class="item-title" contenteditable="true" spellcheck="false"
                   onkeydown="if(event.key==='Enter'){event.preventDefault();setTitle('${item.id}',this.textContent.trim());}if(event.key==='Escape')cancelTitleEdit();"
-                  onblur="setTitle('${item.id}',this.textContent.trim())">${esc(item.title)}</span></div>`
+                  onblur="setTitle('${item.id}',this.textContent.trim())">${esc(item.title)}</span><button class="btn-title-done" onmousedown="event.preventDefault()" onclick="setTitle('${item.id}',document.getElementById('titleedit-${item.id}').textContent.trim())">✓</button></div>`
         : `<div class="item-title-wrap"><span class="item-title">${esc(item.title)}</span><button class="btn-title-edit" onclick="startTitleEdit('${item.id}')">✎</button></div>`}
       ${tagsArea}
       <div class="item-btns">
