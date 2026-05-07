@@ -31,7 +31,7 @@
       #app { padding: 12px 16px 60px; }
     }
     @media (hover: none) {
-      button {
+      button:not(.item-del):not(.btn-tag-edit) {
         min-height: 44px;
         display: inline-flex;
         align-items: center;
@@ -67,32 +67,32 @@
       margin-right: 6px;
     }
 
-    .btn-new {
-      background: none;
+    .btn-new, .btn-gear {
+      background: rgba(55,53,47,0.04);
       border: none;
       cursor: pointer;
-      font-size: 13px;
       font-family: inherit;
+      height: 30px;
+      padding: 0 10px;
+      border-radius: 4px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.1s, color 0.1s;
+    }
+    .btn-new {
+      font-size: 13px;
       font-weight: 500;
       color: rgba(55,53,47,0.65);
-      padding: 5px 10px;
-      border-radius: 4px;
-      transition: background 0.1s, color 0.1s;
     }
-    .btn-new:hover { background: rgba(55,53,47,0.08); color: #37352f; }
-
     .btn-gear {
-      background: none;
-      border: none;
-      cursor: pointer;
       color: rgba(55,53,47,0.4);
-      font-size: 15px;
-      padding: 5px 6px;
-      border-radius: 4px;
+      padding: 0;
+      width: 30px;
+      font-size: 16px;
       line-height: 1;
-      transition: background 0.1s, color 0.1s;
     }
-    .btn-gear:hover { background: rgba(55,53,47,0.08); color: #37352f; }
+    .btn-new:hover, .btn-gear:hover { background: rgba(55,53,47,0.08); color: #37352f; }
 
     /* ── Add form ── */
     .add-form {
@@ -244,6 +244,14 @@
       .item:hover .btn-tag-edit,
       .item:hover .drag-handle { opacity: 1; }
     }
+    @media (hover: none) {
+      .item-btns,
+      .btn-tag-edit,
+      .drag-handle { opacity: 0; transition: opacity 0.1s; }
+      .item.touch-sel .item-btns,
+      .item.touch-sel .btn-tag-edit,
+      .item.touch-sel .drag-handle { opacity: 1; }
+    }
 
     .item-del {
       background: none;
@@ -251,7 +259,12 @@
       cursor: pointer;
       font-size: 14px;
       color: rgba(55,53,47,0.4);
-      padding: 2px 6px;
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       border-radius: 3px;
       line-height: 1;
       transition: background 0.1s, color 0.1s;
@@ -425,7 +438,12 @@
       cursor: pointer;
       font-size: 11px;
       color: rgba(55,53,47,0.25);
-      padding: 1px 5px;
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       border-radius: 3px;
       transition: background 0.1s, color 0.1s;
     }
@@ -510,6 +528,7 @@ let draggedId      = null;
 let activeTag      = null;
 let editingTagsFor  = null;
 let editingTitleFor = null;
+let touchSelId      = null;
 
 // ── Utilities ────────────────────────────────────────────────
 
@@ -655,6 +674,22 @@ function cancelTagEdit() {
   render();
 }
 
+const isTouch = () => window.matchMedia('(hover: none)').matches;
+
+function touchSelect(id, e) {
+  if (!isTouch()) return;
+  if (touchSelId === id) return;
+  e.stopPropagation();
+  if (touchSelId) document.querySelector(`.item[data-id="${touchSelId}"]`)?.classList.remove('touch-sel');
+  touchSelId = id;
+  document.querySelector(`.item[data-id="${id}"]`)?.classList.add('touch-sel');
+}
+
+function onTitleClick(id, e) {
+  if (isTouch() && touchSelId !== id) { touchSelect(id, e); return; }
+  startTitleEdit(id);
+}
+
 function startTitleEdit(id) {
   editingTitleFor = id;
   editingTagsFor  = null;
@@ -707,13 +742,17 @@ function confirmDelete(btn, id) {
     deleteItem(id);
   } else {
     btn.dataset.pending = '1';
-    btn.textContent = 'delete?';
+    btn.textContent = '×?';
     btn.style.color = '#e03e3e';
+    btn.style.width = 'auto';
+    btn.style.padding = '0 6px';
     setTimeout(() => {
       if (btn.dataset.pending === '1') {
         btn.dataset.pending = '';
         btn.textContent = '×';
         btn.style.color = '';
+        btn.style.width = '';
+        btn.style.padding = '';
       }
     }, 3000);
   }
@@ -813,6 +852,46 @@ function onDragEnd() {
   );
 }
 
+function onTouchDragStart(e, id) {
+  draggedId = id;
+  document.querySelector(`.item[data-id="${id}"]`)?.classList.add('dragging');
+}
+
+function onTouchDragMove(e) {
+  if (!draggedId) return;
+  e.preventDefault();
+  const touch = e.touches[0];
+  const draggedEl = document.querySelector(`.item[data-id="${draggedId}"]`);
+  if (draggedEl) draggedEl.style.visibility = 'hidden';
+  const target = document.elementFromPoint(touch.clientX, touch.clientY);
+  if (draggedEl) draggedEl.style.visibility = '';
+  document.querySelectorAll('.item').forEach(el =>
+    el.classList.remove('drag-over-top', 'drag-over-bottom')
+  );
+  if (!target) return;
+  const item = target.closest('.item');
+  if (item && item.dataset.id !== draggedId) {
+    const rect = item.getBoundingClientRect();
+    item.classList.add(touch.clientY < rect.top + rect.height / 2 ? 'drag-over-top' : 'drag-over-bottom');
+  }
+}
+
+function onTouchDragEnd(e) {
+  if (!draggedId) return;
+  const touch = e.changedTouches[0];
+  const draggedEl = document.querySelector(`.item[data-id="${draggedId}"]`);
+  if (draggedEl) draggedEl.style.visibility = 'hidden';
+  const target = document.elementFromPoint(touch.clientX, touch.clientY);
+  if (draggedEl) draggedEl.style.visibility = '';
+  if (target) {
+    const item = target.closest('.item');
+    if (item && item.dataset.id !== draggedId) { onDrop({ preventDefault:()=>{} }, item.dataset.id); return; }
+    const section = target.closest('[data-status]');
+    if (section) { onSectionDrop({ preventDefault:()=>{} }, section.dataset.status); return; }
+  }
+  onDragEnd();
+}
+
 // ── Render ───────────────────────────────────────────────────
 
 function pickStatus(s) {
@@ -838,6 +917,7 @@ function itemHTML(item) {
 
   return `
     <div class="item" data-id="${item.id}"
+         onclick="touchSelect('${item.id}',event)"
          ondragover="onDragOver(event,'${item.id}')"
          ondragleave="onDragLeave(event)"
          ondrop="onDrop(event,'${item.id}')"
@@ -846,20 +926,23 @@ function itemHTML(item) {
         ? `<span id="titleedit-${item.id}" class="item-title" contenteditable="true" spellcheck="false"
                   onkeydown="if(event.key==='Enter'){event.preventDefault();setTitle('${item.id}',this.textContent.trim());}if(event.key==='Escape')cancelTitleEdit();"
                   onblur="setTitle('${item.id}',this.textContent.trim())">${esc(item.title)}</span>`
-        : `<span class="item-title" onclick="startTitleEdit('${item.id}')">${esc(item.title)}</span>`}
+        : `<span class="item-title" onclick="onTitleClick('${item.id}',event)">${esc(item.title)}</span>`}
       ${tagsArea}
       <div class="item-btns">
         <button class="item-del" onclick="confirmDelete(this,'${item.id}')">×</button>
       </div>
       <span class="drag-handle" draggable="true"
-            ondragstart="onDragStart(event,'${item.id}')">⠿</span>
+            ondragstart="onDragStart(event,'${item.id}')"
+            ontouchstart="onTouchDragStart(event,'${item.id}')"
+            ontouchmove="onTouchDragMove(event)"
+            ontouchend="onTouchDragEnd(event)">⠿</span>
     </div>`;
 }
 
 function sectionHTML(status) {
   const items = data.items.filter(i => i.status === status && (!activeTag || i.tags.includes(activeTag)));
   return `
-    <div class="section"
+    <div class="section" data-status="${status}"
          ondragover="onSectionDragOver(event,'${status}')"
          ondragleave="onSectionDragLeave(event)"
          ondrop="onSectionDrop(event,'${status}')">
@@ -902,7 +985,7 @@ function render() {
       <div class="header-right">
         <span class="sync-status"></span>
         <button class="btn-new" onclick="startAdd()">+ New</button>
-        <button class="btn-gear" onclick="showSetup()" title="settings">⚙</button>
+        <button class="btn-gear" onclick="document.querySelector('.setup-card') ? render() : showSetup()" title="settings">⚙</button>
       </div>
     </header>
     ${isAdding ? addFormHTML() : ''}
@@ -974,14 +1057,14 @@ function showSetup() {
     <header>
       <span class="site-title">${esc(title)}</span>
       <div class="header-right">
-        <button class="btn-gear" onclick="showSetup()" title="settings">⚙</button>
+        <button class="btn-gear" onclick="document.querySelector('.setup-card') ? render() : showSetup()" title="settings">⚙</button>
       </div>
     </header>
     <div class="setup-card">
       <div class="setup-head">Setup</div>
       <p class="setup-desc">
         Create a private GitHub repo for your data, then enter your credentials below.
-        Your PAT is saved only in this browser — it never appears in the app's source.
+        Your PAT is saved only in this browser.
       </p>
       <div class="field">
         <label class="field-label" for="s-title">Title</label>
@@ -1068,6 +1151,13 @@ async function init() {
 }
 
 init();
+
+document.addEventListener('click', e => {
+  if (touchSelId && !e.target.closest(`.item[data-id="${touchSelId}"]`)) {
+    document.querySelector(`.item[data-id="${touchSelId}"]`)?.classList.remove('touch-sel');
+    touchSelId = null;
+  }
+});
 
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js').catch(() => {});
