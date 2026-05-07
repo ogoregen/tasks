@@ -528,6 +528,7 @@ async function ghFetch(path, opts = {}) {
   return fetch(
     `https://api.github.com/repos/${config.owner}/${config.repo}${path}`,
     {
+      cache: 'no-store',
       ...opts,
       headers: {
         Authorization: `Bearer ${config.pat}`,
