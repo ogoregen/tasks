@@ -464,6 +464,13 @@
       margin-bottom: 10px;
     }
     .add-tags-input::placeholder { color: rgba(55,53,47,0.25); }
+
+    .add-tag-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-bottom: 8px;
+    }
   </style>
 </head>
 <body>
@@ -596,7 +603,7 @@ function syncMsg(msg) {
 // ── Data operations ──────────────────────────────────────────
 
 function parseTags(str) {
-  return str.split(',').map(t => t.trim().toLowerCase()).filter(Boolean);
+  return str.split(',').map(t => t.trim()).filter(Boolean);
 }
 
 function allTags() {
@@ -629,6 +636,19 @@ function startTagEdit(id) {
 function cancelTagEdit() {
   editingTagsFor = null;
   render();
+}
+
+function toggleAddTag(tag) {
+  const inp = document.getElementById('inp-tags');
+  if (!inp) return;
+  const tags = parseTags(inp.value);
+  const idx = tags.indexOf(tag);
+  if (idx >= 0) tags.splice(idx, 1);
+  else tags.push(tag);
+  inp.value = tags.join(', ');
+  document.querySelectorAll('.add-tag-opt').forEach(el => {
+    el.classList.toggle('active', tags.includes(el.dataset.tag));
+  });
 }
 
 function addItem(title, status, tags) {
@@ -802,7 +822,8 @@ function addFormHTML() {
         `).join('')}
       </div>
       <input id="inp-title" class="add-input" type="text" placeholder="Title" autocomplete="off" spellcheck="false">
-      <input id="inp-tags" class="add-tags-input" type="text" placeholder="Tags: fiction, js, … (optional)" autocomplete="off" spellcheck="false">
+      ${(()=>{ const t=allTags(); return t.length ? `<div class="add-tag-options">${t.map(tag=>`<span class="tag add-tag-opt" data-tag="${esc(tag)}" onclick="toggleAddTag('${esc(tag)}')">${esc(tag)}</span>`).join('')}</div>` : ''; })()}
+      <input id="inp-tags" class="add-tags-input" type="text" placeholder="Tags" autocomplete="off" spellcheck="false">
       <div class="add-btns">
         <button class="btn-submit" onclick="submitAdd()">Add</button>
         <button class="btn-dismiss" onclick="cancelAdd()">Cancel</button>
