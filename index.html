@@ -37,6 +37,7 @@
         align-items: center;
         justify-content: center;
       }
+      .btn-gear { width: 44px; }
     }
 
     /* ── Header ── */
@@ -245,12 +246,11 @@
       .item:hover .drag-handle { opacity: 1; }
     }
     @media (hover: none) {
-      .item-btns,
-      .btn-tag-edit,
-      .drag-handle { opacity: 0; transition: opacity 0.1s; }
-      .item.touch-sel .item-btns,
-      .item.touch-sel .btn-tag-edit,
-      .item.touch-sel .drag-handle { opacity: 1; }
+      .item-btns, .drag-handle { display: none; }
+      .btn-tag-edit { display: none; }
+      .item.touch-sel .item-btns { display: flex; }
+      .item.touch-sel .btn-tag-edit { display: inline-flex; }
+      .item.touch-sel .drag-handle { display: inline; }
     }
 
     .item-del {
