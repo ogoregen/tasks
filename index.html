@@ -216,9 +216,19 @@
     }
     .item:hover { background: rgba(55,53,47,0.04); }
 
-    .item.dragging         { opacity: 0.4; }
-    .item.drag-over-top    { box-shadow: 0 -2px 0 #37352f; }
-    .item.drag-over-bottom { box-shadow: 0  2px 0 #37352f; }
+    .item.dragging { opacity: 0.4; }
+    .item { position: relative; }
+    .item.drag-over-top::before,
+    .item.drag-over-bottom::after {
+      content: '';
+      position: absolute;
+      left: 0; right: 0;
+      height: 2px;
+      background: #37352f;
+      border-radius: 0;
+    }
+    .item.drag-over-top::before    { top: -1px; }
+    .item.drag-over-bottom::after  { bottom: -1px; }
 
     .item-title {
       flex: 1;
@@ -236,21 +246,6 @@
       align-items: center;
       gap: 2px;
       flex-shrink: 0;
-    }
-    @media (hover: hover) {
-      .item-btns,
-      .btn-tag-edit,
-      .drag-handle { opacity: 0; transition: opacity 0.1s; }
-      .item:hover .item-btns,
-      .item:hover .btn-tag-edit,
-      .item:hover .drag-handle { opacity: 1; }
-    }
-    @media (hover: none) {
-      .item-btns, .drag-handle { display: none; }
-      .btn-tag-edit { display: none; }
-      .item.touch-sel .item-btns { display: flex; }
-      .item.touch-sel .btn-tag-edit { display: inline-flex; }
-      .item.touch-sel .drag-handle { display: inline; }
     }
 
     .item-del {
@@ -448,6 +443,22 @@
       transition: background 0.1s, color 0.1s;
     }
     .btn-tag-edit:hover { background: rgba(55,53,47,0.08); color: #37352f; }
+
+    @media (hover: hover) {
+      .item-btns,
+      .btn-tag-edit,
+      .drag-handle { opacity: 0; transition: opacity 0.1s; }
+      .item:hover .item-btns,
+      .item:hover .btn-tag-edit,
+      .item:hover .drag-handle { opacity: 1; }
+    }
+    @media (hover: none) {
+      .item-btns, .drag-handle { display: none; }
+      .btn-tag-edit { display: none; }
+      .item.touch-sel .item-btns { display: flex; }
+      .item.touch-sel .btn-tag-edit { display: inline-flex; }
+      .item.touch-sel .drag-handle { display: inline; }
+    }
 
     .tag-edit-wrap {
       display: flex;
@@ -887,7 +898,7 @@ function onTouchDragEnd(e) {
     const item = target.closest('.item');
     if (item && item.dataset.id !== draggedId) { onDrop({ preventDefault:()=>{} }, item.dataset.id); return; }
     const section = target.closest('[data-status]');
-    if (section) { onSectionDrop({ preventDefault:()=>{} }, section.dataset.status); return; }
+    if (section) { onSectionDrop({ preventDefault:()=>{} }, section.dataset.status); }
   }
   onDragEnd();
 }
