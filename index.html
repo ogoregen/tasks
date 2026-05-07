@@ -896,7 +896,10 @@ function onTouchDragEnd(e) {
   if (draggedEl) draggedEl.style.visibility = '';
   if (target) {
     const item = target.closest('.item');
-    if (item && item.dataset.id !== draggedId) { onDrop({ preventDefault:()=>{} }, item.dataset.id); return; }
+    if (item && item.dataset.id !== draggedId) {
+      onDrop({ preventDefault:()=>{}, stopPropagation:()=>{}, clientY: touch.clientY, currentTarget: item }, item.dataset.id);
+      return;
+    }
     const section = target.closest('[data-status]');
     if (section) { onSectionDrop({ preventDefault:()=>{} }, section.dataset.status); }
   }
