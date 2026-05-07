@@ -37,7 +37,6 @@
         align-items: center;
         justify-content: center;
       }
-      .btn-gear { width: 44px; }
     }
 
     /* ── Header ── */
@@ -239,7 +238,7 @@
       white-space: nowrap;
     }
     .item-title:not([contenteditable]) { cursor: pointer; }
-    .item-title[contenteditable] { outline: none; cursor: text; }
+    .item-title[contenteditable] { outline: none; cursor: text; border-bottom: 1.5px solid rgba(55,53,47,0.3); }
 
     .item-btns {
       display: flex;
@@ -453,6 +452,7 @@
       .item:hover .drag-handle { opacity: 1; }
     }
     @media (hover: none) {
+      .btn-gear { width: 44px; }
       .item-btns, .drag-handle { display: none; }
       .btn-tag-edit { display: none; }
       .item.touch-sel .item-btns { display: flex; }
