@@ -1079,6 +1079,10 @@ function render() {
       sel.addRange(range);
     }
   }
+
+  if (touchSelId) {
+    document.querySelector(`.item[data-id="${touchSelId}"]`)?.classList.add('touch-sel');
+  }
 }
 
 function startAdd() {
