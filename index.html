@@ -989,7 +989,7 @@ async function init() {
     render();
   } catch (e) {
     document.getElementById('app').innerHTML =
-      `<div class="loading">Failed to load: ${esc(e.message)}</div>`;
+      `<div class="loading">Failed to load: ${esc(e.message)}<br><br><button class="btn-submit" onclick="showSetup()">Settings</button></div>`;
   }
 }
 
