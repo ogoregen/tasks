@@ -229,16 +229,38 @@
     .item.drag-over-top::before    { top: -1px; }
     .item.drag-over-bottom::after  { bottom: -1px; }
 
-    .item-title {
+    .item-title-wrap {
       flex: 1;
+      min-width: 0;
+      display: flex;
+      align-items: center;
+    }
+    .item-title {
       font-size: 14px;
       color: #37352f;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+      min-width: 0;
     }
-    .item-title:not([contenteditable]) { cursor: pointer; }
-    .item-title[contenteditable] { outline: none; cursor: text; border-bottom: 1.5px solid rgba(55,53,47,0.3); }
+    .item-title[contenteditable] { flex: 1; outline: none; cursor: text; border-bottom: 1.5px solid rgba(55,53,47,0.3); }
+    .btn-title-edit {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 11px;
+      color: rgba(55,53,47,0.25);
+      width: 22px;
+      height: 22px;
+      padding: 0;
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 3px;
+      transition: background 0.1s, color 0.1s;
+    }
+    .btn-title-edit:hover { background: rgba(55,53,47,0.08); color: #37352f; }
 
     .item-btns {
       display: flex;
@@ -443,17 +465,20 @@
     @media (hover: hover) {
       .item-btns,
       .btn-tag-edit,
+      .btn-title-edit,
       .drag-handle { opacity: 0; transition: opacity 0.1s; }
       .item:hover .item-btns,
       .item:hover .btn-tag-edit,
+      .item:hover .btn-title-edit,
       .item:hover .drag-handle { opacity: 1; }
     }
     @media (hover: none) {
       .btn-gear { width: 44px; }
       .item-btns, .drag-handle { display: none; }
-      .btn-tag-edit { display: none; }
+      .btn-tag-edit, .btn-title-edit { display: none; }
       .item.touch-sel .item-btns { display: flex; }
       .item.touch-sel .btn-tag-edit { display: inline-flex; }
+      .item.touch-sel .btn-title-edit { display: inline-flex; }
       .item.touch-sel .drag-handle { display: inline; }
     }
 
@@ -693,10 +718,6 @@ function touchSelect(id, e) {
   document.querySelector(`.item[data-id="${id}"]`)?.classList.add('touch-sel');
 }
 
-function onTitleClick(id, e) {
-  if (isTouch() && touchSelId !== id) { touchSelect(id, e); return; }
-  startTitleEdit(id);
-}
 
 function startTitleEdit(id) {
   editingTitleFor = id;
@@ -934,10 +955,10 @@ function itemHTML(item) {
          ondrop="onDrop(event,'${item.id}')"
          ondragend="onDragEnd()">
       ${editingTitleFor === item.id
-        ? `<span id="titleedit-${item.id}" class="item-title" contenteditable="true" spellcheck="false"
+        ? `<div class="item-title-wrap"><span id="titleedit-${item.id}" class="item-title" contenteditable="true" spellcheck="false"
                   onkeydown="if(event.key==='Enter'){event.preventDefault();setTitle('${item.id}',this.textContent.trim());}if(event.key==='Escape')cancelTitleEdit();"
-                  onblur="setTitle('${item.id}',this.textContent.trim())">${esc(item.title)}</span>`
-        : `<span class="item-title" onclick="onTitleClick('${item.id}',event)">${esc(item.title)}</span>`}
+                  onblur="setTitle('${item.id}',this.textContent.trim())">${esc(item.title)}</span></div>`
+        : `<div class="item-title-wrap"><span class="item-title">${esc(item.title)}</span><button class="btn-title-edit" onclick="startTitleEdit('${item.id}')">✎</button></div>`}
       ${tagsArea}
       <div class="item-btns">
         <button class="item-del" onclick="confirmDelete(this,'${item.id}')">×</button>
