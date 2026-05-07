@@ -419,11 +419,8 @@
       border-radius: 3px;
       background: rgba(55,53,47,0.07);
       color: rgba(55,53,47,0.55);
-      cursor: pointer;
       white-space: nowrap;
-      transition: background 0.1s, color 0.1s;
     }
-    .item-tag:hover  { background: rgba(55,53,47,0.14); color: #37352f; }
     .item-tag.active { background: #37352f; color: #fff; }
 
     .btn-tag-edit {
@@ -925,7 +922,7 @@ function itemHTML(item) {
          <button class="btn-tag-cancel" onclick="cancelTagEdit()">cancel</button>
        </div>`
     : `<div class="item-tags">
-         ${item.tags.map(t => `<span class="item-tag${activeTag===t?' active':''}" onclick="filterByTag('${esc(t)}')">${esc(t)}</span>`).join('')}
+         ${item.tags.map(t => `<span class="item-tag${activeTag===t?' active':''}">${esc(t)}</span>`).join('')}
          <button class="btn-tag-edit" onclick="startTagEdit('${item.id}')">✎</button>
        </div>`;
 
