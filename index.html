@@ -30,6 +30,14 @@
     @media (max-width: 600px) {
       #app { padding: 12px 16px 60px; }
     }
+    @media (hover: none) {
+      button {
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+    }
 
     /* ── Header ── */
     header {
@@ -129,7 +137,7 @@
     }
     .add-input::placeholder { color: rgba(55,53,47,0.3); }
 
-    .add-btns { display: flex; gap: 6px; }
+    .add-btns { display: flex; gap: 6px; margin-top: 12px; }
 
     .btn-submit {
       background: #37352f;
@@ -219,16 +227,23 @@
       text-overflow: ellipsis;
       white-space: nowrap;
     }
+    .item-title:not([contenteditable]) { cursor: pointer; }
+    .item-title[contenteditable] { outline: none; cursor: text; }
 
     .item-btns {
       display: flex;
       align-items: center;
       gap: 2px;
       flex-shrink: 0;
-      opacity: 0;
-      transition: opacity 0.1s;
     }
-    .item:hover .item-btns { opacity: 1; }
+    @media (hover: hover) {
+      .item-btns,
+      .btn-tag-edit,
+      .drag-handle { opacity: 0; transition: opacity 0.1s; }
+      .item:hover .item-btns,
+      .item:hover .btn-tag-edit,
+      .item:hover .drag-handle { opacity: 1; }
+    }
 
     .item-del {
       background: none;
@@ -250,10 +265,7 @@
       flex-shrink: 0;
       font-size: 13px;
       line-height: 1;
-      opacity: 0;
-      transition: opacity 0.1s;
     }
-    .item:hover .drag-handle { opacity: 1; }
     .drag-handle:active { cursor: grabbing; }
 
     /* ── Setup ── */
@@ -415,10 +427,8 @@
       color: rgba(55,53,47,0.25);
       padding: 1px 5px;
       border-radius: 3px;
-      opacity: 0;
-      transition: opacity 0.1s, background 0.1s, color 0.1s;
+      transition: background 0.1s, color 0.1s;
     }
-    .item:hover .btn-tag-edit { opacity: 1; }
     .btn-tag-edit:hover { background: rgba(55,53,47,0.08); color: #37352f; }
 
     .tag-edit-wrap {
@@ -455,24 +465,26 @@
     .btn-tag-cancel:hover { background: rgba(55,53,47,0.08); color: #37352f; }
 
     .add-tags-input {
-      display: block;
-      width: 100%;
+      flex: 1;
+      min-width: 60px;
       border: none;
       outline: none;
       font-size: 12px;
       font-family: inherit;
       color: #37352f;
       background: transparent;
-      padding: 4px 0;
-      margin-bottom: 10px;
+      padding: 0;
     }
     .add-tags-input::placeholder { color: rgba(55,53,47,0.25); }
 
-    .add-tag-options {
+    .add-tags-row {
       display: flex;
       flex-wrap: wrap;
+      align-items: center;
       gap: 5px;
-      margin-bottom: 8px;
+      padding: 0;
+      margin-bottom: 10px;
+      cursor: text;
     }
   </style>
 </head>
@@ -496,7 +508,8 @@ let isSaving       = false;
 let needsSave      = false;
 let draggedId      = null;
 let activeTag      = null;
-let editingTagsFor = null;
+let editingTagsFor  = null;
+let editingTitleFor = null;
 
 // ── Utilities ────────────────────────────────────────────────
 
@@ -642,6 +655,28 @@ function cancelTagEdit() {
   render();
 }
 
+function startTitleEdit(id) {
+  editingTitleFor = id;
+  editingTagsFor  = null;
+  render();
+}
+
+function setTitle(id, value) {
+  if (!editingTitleFor) return;
+  const item = data.items.find(i => i.id === id);
+  if (!item) return;
+  const v = value.trim();
+  if (v) item.title = v;
+  editingTitleFor = null;
+  ghSave();
+  render();
+}
+
+function cancelTitleEdit() {
+  editingTitleFor = null;
+  render();
+}
+
 function toggleAddTag(tag) {
   const inp = document.getElementById('inp-tags');
   if (!inp) return;
@@ -665,6 +700,23 @@ function deleteItem(id) {
   data.items = data.items.filter(i => i.id !== id);
   ghSave();
   render();
+}
+
+function confirmDelete(btn, id) {
+  if (btn.dataset.pending === '1') {
+    deleteItem(id);
+  } else {
+    btn.dataset.pending = '1';
+    btn.textContent = 'delete?';
+    btn.style.color = '#e03e3e';
+    setTimeout(() => {
+      if (btn.dataset.pending === '1') {
+        btn.dataset.pending = '';
+        btn.textContent = '×';
+        btn.style.color = '';
+      }
+    }, 3000);
+  }
 }
 
 function setStatus(id, status) {
@@ -781,7 +833,7 @@ function itemHTML(item) {
        </div>`
     : `<div class="item-tags">
          ${item.tags.map(t => `<span class="item-tag${activeTag===t?' active':''}" onclick="filterByTag('${esc(t)}')">${esc(t)}</span>`).join('')}
-         <button class="btn-tag-edit" onclick="startTagEdit('${item.id}')">+ tag</button>
+         <button class="btn-tag-edit" onclick="startTagEdit('${item.id}')">✎</button>
        </div>`;
 
   return `
@@ -790,10 +842,14 @@ function itemHTML(item) {
          ondragleave="onDragLeave(event)"
          ondrop="onDrop(event,'${item.id}')"
          ondragend="onDragEnd()">
-      <span class="item-title">${esc(item.title)}</span>
+      ${editingTitleFor === item.id
+        ? `<span id="titleedit-${item.id}" class="item-title" contenteditable="true" spellcheck="false"
+                  onkeydown="if(event.key==='Enter'){event.preventDefault();setTitle('${item.id}',this.textContent.trim());}if(event.key==='Escape')cancelTitleEdit();"
+                  onblur="setTitle('${item.id}',this.textContent.trim())">${esc(item.title)}</span>`
+        : `<span class="item-title" onclick="startTitleEdit('${item.id}')">${esc(item.title)}</span>`}
       ${tagsArea}
       <div class="item-btns">
-        <button class="item-del" onclick="deleteItem('${item.id}')">×</button>
+        <button class="item-del" onclick="confirmDelete(this,'${item.id}')">×</button>
       </div>
       <span class="drag-handle" draggable="true"
             ondragstart="onDragStart(event,'${item.id}')">⠿</span>
@@ -826,8 +882,10 @@ function addFormHTML() {
         `).join('')}
       </div>
       <input id="inp-title" class="add-input" type="text" placeholder="Title" autocomplete="off" spellcheck="false">
-      ${(()=>{ const t=allTags(); return t.length ? `<div class="add-tag-options">${t.map(tag=>`<span class="tag add-tag-opt" data-tag="${esc(tag)}" onclick="toggleAddTag('${esc(tag)}')">${esc(tag)}</span>`).join('')}</div>` : ''; })()}
-      <input id="inp-tags" class="add-tags-input" type="text" placeholder="Tags" autocomplete="off" spellcheck="false">
+      <div class="add-tags-row" onclick="document.getElementById('inp-tags').focus()">
+        ${allTags().map(tag=>`<span class="tag add-tag-opt" data-tag="${esc(tag)}" onclick="toggleAddTag('${esc(tag)}')">${esc(tag)}</span>`).join('')}
+        <input id="inp-tags" class="add-tags-input" type="text" placeholder="Tags" autocomplete="off" spellcheck="false">
+      </div>
       <div class="add-btns">
         <button class="btn-submit" onclick="submitAdd()">Add</button>
         <button class="btn-dismiss" onclick="cancelAdd()">Cancel</button>
@@ -871,6 +929,18 @@ function render() {
   if (editingTagsFor) {
     const inp = document.getElementById(`tagedit-${editingTagsFor}`);
     if (inp) { inp.focus(); inp.select(); }
+  }
+
+  if (editingTitleFor) {
+    const el = document.getElementById(`titleedit-${editingTitleFor}`);
+    if (el) {
+      el.focus();
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
   }
 }
 
@@ -937,6 +1007,10 @@ function showSetup() {
     </div>`;
 
   document.getElementById('s-title').focus();
+  ['s-title','s-pat','s-owner','s-repo'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('keydown', e => { if (e.key === 'Enter') saveSetup(); });
+  });
 }
 
 async function saveSetup() {
