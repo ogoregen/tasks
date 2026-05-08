@@ -487,7 +487,8 @@ function render() {
         ${tags.map(t => `<span class="tag${activeTag===t?' active':''}" onclick="filterByTag('${esc(t)}')">${esc(t)}</span>`).join('')}
       </div>`;
     })()}
-    ${STATUSES.map(sectionHTML).join('')}`;
+    ${STATUSES.map(sectionHTML).join('')}
+    <div class="page-end">· · ·</div>`;
 
   if (isAdding) {
     const inp    = document.getElementById('inp-title');
