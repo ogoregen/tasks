@@ -139,6 +139,8 @@ function allTags() {
 
 function filterByTag(tag) {
   activeTag = activeTag === tag ? null : tag;
+  if (activeTag) localStorage.setItem('activeTag', activeTag);
+  else localStorage.removeItem('activeTag');
   render();
 }
 
@@ -627,6 +629,7 @@ async function saveSetup() {
 
 async function init() {
   try { config = JSON.parse(localStorage.getItem(CFG_KEY)); } catch { config = null; }
+  activeTag = localStorage.getItem('activeTag') || null;
 
   if (!config) { showSetup(); return; }
 
