@@ -440,7 +440,7 @@ function sectionHTML(status) {
       </div>
       ${items.length
         ? items.map(itemHTML).join('')
-        : `<div class="section-empty">Nothing here yet.</div>`}
+        : `<div class="section-empty">—</div>`}
     </div>`;
 }
 
