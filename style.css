@@ -500,14 +500,12 @@ header {
 .btn-tag-edit:hover { background: rgba(55,53,47,0.08); color: #37352f; }
 
 @media (hover: hover) {
-  .item-btns,
-  .btn-tag-edit,
-  .btn-title-edit,
-  .drag-handle { opacity: 0; transition: opacity 0.1s; }
-  .item:hover .item-btns,
-  .item:hover .btn-tag-edit,
-  .item:hover .btn-title-edit,
-  .item:hover .drag-handle { opacity: 1; }
+  .item-btns, .drag-handle { display: none; }
+  .btn-tag-edit, .btn-title-edit { display: none; }
+  .item:hover .item-btns { display: flex; }
+  .item:hover .drag-handle { display: inline; }
+  .item:hover .btn-tag-edit { display: inline-flex; }
+  .item:hover .btn-title-edit { display: inline-flex; }
 }
 @media (hover: none) {
 
