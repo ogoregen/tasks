@@ -85,9 +85,6 @@ header {
   line-height: 1;
 }
 .btn-new:hover, .btn-gear:hover { background: rgba(55,53,47,0.08); color: #37352f; }
-@media (hover: none) {
-  .btn-new { padding: 0 20px; }
-}
 
 /* ── Add form ── */
 .add-form {
