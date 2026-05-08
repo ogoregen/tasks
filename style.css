@@ -64,7 +64,7 @@ header {
   border: none;
   cursor: pointer;
   font-family: inherit;
-  height: 30px;
+  height: 32px;
   padding: 0 14px;
   border-radius: 4px;
   display: inline-flex;
@@ -80,7 +80,7 @@ header {
 .btn-gear {
   color: rgba(55,53,47,0.4);
   padding: 0;
-  width: 30px;
+  width: 32px;
   font-size: 16px;
   line-height: 1;
 }
@@ -139,7 +139,10 @@ header {
   font-size: 12px;
   font-family: inherit;
   font-weight: 500;
-  padding: 5px 14px;
+  height: 32px;
+  padding: 0 14px;
+  display: inline-flex;
+  align-items: center;
   border-radius: 4px;
   transition: background 0.1s;
 }
@@ -152,7 +155,10 @@ header {
   font-size: 12px;
   font-family: inherit;
   color: rgba(55,53,47,0.5);
-  padding: 5px 10px;
+  height: 32px;
+  padding: 0 14px;
+  display: inline-flex;
+  align-items: center;
   border-radius: 4px;
   transition: background 0.1s, color 0.1s;
 }
@@ -390,7 +396,10 @@ header {
   font-size: 13px;
   font-family: inherit;
   font-weight: 500;
-  padding: 7px 18px;
+  height: 32px;
+  padding: 0 14px;
+  display: inline-flex;
+  align-items: center;
   transition: background 0.1s;
 }
 .btn-connect:hover { background: #555450; }
@@ -402,7 +411,10 @@ header {
   font-size: 13px;
   font-family: inherit;
   color: rgba(55,53,47,0.5);
-  padding: 7px 8px;
+  height: 32px;
+  padding: 0 14px;
+  display: inline-flex;
+  align-items: center;
   border-radius: 4px;
   transition: background 0.1s, color 0.1s;
 }
@@ -498,7 +510,7 @@ header {
   .item:hover .drag-handle { opacity: 1; }
 }
 @media (hover: none) {
-  .btn-gear { width: 44px; }
+
   .item-btns, .drag-handle { display: none; }
   .btn-tag-edit, .btn-title-edit { display: none; }
   .item.touch-sel .item-btns { display: flex; }
