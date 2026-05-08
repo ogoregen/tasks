@@ -790,7 +790,7 @@ function toggleAddTag(tag) {
 }
 
 function addItem(title, status, tags) {
-  data.items.unshift({ id: uid(), title: title.trim(), status, tags: tags || [], addedAt: new Date().toISOString() });
+  data.items.unshift({ id: uid(), title: title.trim(), status, tags: tags || [], addedAt: new Date().toISOString().slice(0, 19) + 'Z' });
   ghSave();
   render();
 }
