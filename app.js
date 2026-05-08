@@ -109,7 +109,7 @@ async function ghSave(action = 'update') {
     }
     const j = await res.json();
     fileSha = j.content.sha;
-    syncMsg('saved');
+    syncMsg('Saved');
     setTimeout(() => syncMsg(''), 2000);
   } catch (e) {
     syncMsg(`save failed: ${e.message}`);
