@@ -36,6 +36,7 @@ body {
     align-items: center;
     justify-content: center;
   }
+  .btn-new { padding: 0 20px; }
 }
 
 /* ── Header ── */
