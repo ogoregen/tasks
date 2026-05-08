@@ -506,6 +506,7 @@ header {
   .item:hover .drag-handle { display: inline; }
   .item:hover .btn-tag-edit { display: inline-flex; }
   .item:hover .btn-title-edit { display: inline-flex; }
+  .item:hover .item-title { white-space: normal; }
 }
 @media (hover: none) {
 
@@ -515,6 +516,7 @@ header {
   .item.touch-sel .btn-tag-edit { display: inline-flex; }
   .item.touch-sel .btn-title-edit { display: inline-flex; }
   .item.touch-sel .drag-handle { display: inline; }
+  .item.touch-sel .item-title { white-space: normal; }
 }
 
 .tag-edit-wrap {
