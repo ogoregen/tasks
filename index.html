@@ -668,13 +668,13 @@ async function ghLoad() {
   return normalize(JSON.parse(b64dec(j.content.replace(/\s/g, ''))));
 }
 
-async function ghSave() {
+async function ghSave(action = 'update') {
   if (isSaving) { needsSave = true; return; }
   isSaving = true;
   syncMsg('saving…');
   try {
     const body = {
-      message: 'update',
+      message: action,
       content: b64enc(JSON.stringify(data, null, 2)),
       ...(fileSha ? { sha: fileSha } : {})
     };
@@ -726,7 +726,7 @@ function setTags(id, str) {
   if (!item) return;
   item.tags = parseTags(str);
   editingTagsFor = null;
-  ghSave();
+  ghSave('Edit tags');
   render();
 }
 
@@ -767,7 +767,7 @@ function setTitle(id, value) {
   const v = value.trim();
   if (v) item.title = v;
   editingTitleFor = null;
-  ghSave();
+  ghSave('Edit title');
   render();
 }
 
@@ -791,13 +791,13 @@ function toggleAddTag(tag) {
 
 function addItem(title, status, tags) {
   data.items.unshift({ id: uid(), title: title.trim(), status, tags: tags || [], addedAt: new Date().toISOString().slice(0, 19) + 'Z' });
-  ghSave();
+  ghSave('Add item');
   render();
 }
 
 function deleteItem(id) {
   data.items = data.items.filter(i => i.id !== id);
-  ghSave();
+  ghSave('Delete item');
   render();
 }
 
@@ -826,7 +826,7 @@ function setStatus(id, status) {
   const item = data.items.find(i => i.id === id);
   if (!item || item.status === status) return;
   item.status = status;
-  ghSave();
+  ghSave('Set status');
   render();
 }
 
@@ -868,6 +868,7 @@ function onDrop(e, targetId) {
   const draggedItem = data.items.find(i => i.id === draggedId);
   const targetItem  = data.items.find(i => i.id === targetId);
   if (!draggedItem || !targetItem) return;
+  const statusChanged = draggedItem.status !== targetItem.status;
   draggedItem.status = targetItem.status;
   const rect    = e.currentTarget.getBoundingClientRect();
   const before  = e.clientY < rect.top + rect.height / 2;
@@ -876,7 +877,7 @@ function onDrop(e, targetId) {
   const toIdx   = data.items.findIndex(i => i.id === targetId);
   data.items.splice(before ? toIdx : toIdx + 1, 0, dragged);
   draggedId = null;
-  ghSave();
+  ghSave(statusChanged ? 'Set status' : 'Reorder');
   render();
 }
 
@@ -905,7 +906,7 @@ function onSectionDrop(e, status) {
   const [dragged] = data.items.splice(fromIdx, 1);
   data.items.push(dragged);
   draggedId = null;
-  ghSave();
+  ghSave('Reorder');
   render();
 }
 
