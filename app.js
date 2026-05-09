@@ -172,6 +172,7 @@ const isTouch = () => window.matchMedia('(hover: none)').matches;
 
 function touchSelect(id, e) {
   if (!isTouch()) return;
+  closeTitlePopup();
   if (touchSelId === id) {
     document.querySelector(`.item[data-id="${id}"]`)?.classList.remove('touch-sel');
     touchSelId = null;
