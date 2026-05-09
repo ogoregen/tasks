@@ -392,9 +392,18 @@ function onDragEnd() {
 }
 
 let autoScrollTimer = null;
+let autoScrollSpeed = 0;
+
+function tickAutoScroll() {
+  if (autoScrollSpeed !== 0) {
+    (document.scrollingElement || document.documentElement).scrollBy(0, autoScrollSpeed);
+  }
+  autoScrollTimer = requestAnimationFrame(tickAutoScroll);
+}
 
 function clearAutoScroll() {
-  if (autoScrollTimer) { clearInterval(autoScrollTimer); autoScrollTimer = null; }
+  if (autoScrollTimer) { cancelAnimationFrame(autoScrollTimer); autoScrollTimer = null; }
+  autoScrollSpeed = 0;
 }
 
 function onTouchDragStart(e, id) {
@@ -407,15 +416,16 @@ function onTouchDragMove(e) {
   e.preventDefault();
   const touch = e.touches[0];
 
-  clearAutoScroll();
   const edgeSize = 80, maxSpeed = 8;
   const y = touch.clientY, vh = window.innerHeight;
   if (y < edgeSize) {
-    const speed = maxSpeed * (1 - y / edgeSize);
-    autoScrollTimer = setInterval(() => window.scrollBy(0, -speed), 16);
+    autoScrollSpeed = -maxSpeed * (1 - y / edgeSize);
+    if (!autoScrollTimer) autoScrollTimer = requestAnimationFrame(tickAutoScroll);
   } else if (y > vh - edgeSize) {
-    const speed = maxSpeed * (1 - (vh - y) / edgeSize);
-    autoScrollTimer = setInterval(() => window.scrollBy(0, speed), 16);
+    autoScrollSpeed = maxSpeed * (1 - (vh - y) / edgeSize);
+    if (!autoScrollTimer) autoScrollTimer = requestAnimationFrame(tickAutoScroll);
+  } else {
+    clearAutoScroll();
   }
   const draggedEl = document.querySelector(`.item[data-id="${draggedId}"]`);
   if (draggedEl) draggedEl.style.visibility = 'hidden';
@@ -433,7 +443,15 @@ function onTouchDragMove(e) {
     const rect = item.getBoundingClientRect();
     item.classList.add(touch.clientY < rect.top + rect.height / 2 ? 'drag-over-top' : 'drag-over-bottom');
   } else {
-    const section = target.closest('[data-status]');
+    let section = target.closest('[data-status]');
+    if (!section) {
+      let minDist = Infinity;
+      document.querySelectorAll('[data-status]').forEach(s => {
+        const r = s.getBoundingClientRect();
+        const dist = Math.max(0, r.top - touch.clientY, touch.clientY - r.bottom);
+        if (dist < minDist && dist < 40) { minDist = dist; section = s; }
+      });
+    }
     if (section) section.classList.add('section-drag-over');
   }
 }
