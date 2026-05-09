@@ -407,7 +407,9 @@ function clearAutoScroll() {
 }
 
 function onTouchDragStart(e, id) {
+  e.preventDefault();
   draggedId = id;
+  document.body.style.touchAction = 'none';
   document.querySelector(`.item[data-id="${id}"]`)?.classList.add('dragging');
   document.addEventListener('touchmove', onTouchDragMove, { passive: false });
   document.addEventListener('touchend', onTouchDragEnd);
@@ -461,6 +463,7 @@ function onTouchDragMove(e) {
 function onTouchDragEnd(e) {
   document.removeEventListener('touchmove', onTouchDragMove);
   document.removeEventListener('touchend', onTouchDragEnd);
+  document.body.style.touchAction = '';
   clearAutoScroll();
   if (!draggedId) return;
   const touch = e.changedTouches[0];
