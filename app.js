@@ -412,12 +412,15 @@ function startAutoScroll(speed) {
   if (!autoScrollActive) { autoScrollActive = true; requestAnimationFrame(tickAutoScroll); }
 }
 
+let activeDragHandle = null;
+
 function onTouchDragStart(e, id) {
   e.preventDefault();
   draggedId = id;
+  activeDragHandle = e.currentTarget;
+  activeDragHandle.addEventListener('touchmove', onTouchDragMove, { passive: false });
+  activeDragHandle.addEventListener('touchend', onTouchDragEnd);
   document.querySelector(`.item[data-id="${id}"]`)?.classList.add('dragging');
-  document.addEventListener('touchmove', onTouchDragMove, { passive: false });
-  document.addEventListener('touchend', onTouchDragEnd);
 }
 
 function onTouchDragMove(e) {
@@ -464,8 +467,11 @@ function onTouchDragMove(e) {
 }
 
 function onTouchDragEnd(e) {
-  document.removeEventListener('touchmove', onTouchDragMove);
-  document.removeEventListener('touchend', onTouchDragEnd);
+  if (activeDragHandle) {
+    activeDragHandle.removeEventListener('touchmove', onTouchDragMove);
+    activeDragHandle.removeEventListener('touchend', onTouchDragEnd);
+    activeDragHandle = null;
+  }
   clearAutoScroll();
   if (!draggedId) return;
   const touch = e.changedTouches[0];
