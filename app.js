@@ -611,6 +611,12 @@ function render() {
     const inp    = document.getElementById('inp-title');
     const tagInp = document.getElementById('inp-tags');
     inp.focus();
+    if (activeTag && tagInp) {
+      tagInp.value = activeTag;
+      document.querySelectorAll('.add-tag-opt').forEach(el => {
+        el.classList.toggle('active', el.dataset.tag === activeTag);
+      });
+    }
     [inp, tagInp].forEach(el => el && el.addEventListener('keydown', e => {
       if (e.key === 'Enter')  submitAdd();
       if (e.key === 'Escape') cancelAdd();
