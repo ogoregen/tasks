@@ -562,9 +562,9 @@ header {
 @media (hover: none) {
   .item-btns, .drag-handle { display: none; }
   .item.touch-sel .item-btns { display: flex; }
-  .item.touch-sel .drag-handle { display: inline; }
+  .item.touch-sel .drag-handle { display: inline-flex; position: static; transform: none; top: auto; }
   .item.touch-sel .item-tag { display: none; }
-  .item.touch-sel { touch-action: none; padding-left: 28px; }
+  .item.touch-sel { touch-action: none; }
 }
 
 .tag-edit-wrap {
