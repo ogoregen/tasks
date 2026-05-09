@@ -409,10 +409,12 @@ function clearAutoScroll() {
 function onTouchDragStart(e, id) {
   draggedId = id;
   document.querySelector(`.item[data-id="${id}"]`)?.classList.add('dragging');
+  document.addEventListener('touchmove', onTouchDragMove, { passive: false });
+  document.addEventListener('touchend', onTouchDragEnd);
 }
 
 function onTouchDragMove(e) {
-  if (!draggedId) return;
+  if (!draggedId || !e.touches[0]) return;
   e.preventDefault();
   const touch = e.touches[0];
 
@@ -457,6 +459,8 @@ function onTouchDragMove(e) {
 }
 
 function onTouchDragEnd(e) {
+  document.removeEventListener('touchmove', onTouchDragMove);
+  document.removeEventListener('touchend', onTouchDragEnd);
   clearAutoScroll();
   if (!draggedId) return;
   const touch = e.changedTouches[0];
@@ -517,9 +521,7 @@ function itemHTML(item) {
       </div>
       <span class="drag-handle" draggable="true"
             ondragstart="onDragStart(event,'${item.id}')"
-            ontouchstart="onTouchDragStart(event,'${item.id}')"
-            ontouchmove="onTouchDragMove(event)"
-            ontouchend="onTouchDragEnd(event)">⠿</span>
+            ontouchstart="onTouchDragStart(event,'${item.id}')">⠿</span>
     </div>`;
 }
 
