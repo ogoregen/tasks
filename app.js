@@ -115,7 +115,7 @@ async function ghSave(action = 'update') {
     syncMsg('Saved');
     setTimeout(() => syncMsg(''), 2000);
   } catch (e) {
-    syncMsg(`save failed: ${e.message}`);
+    syncMsg(`save failed: ${e.message}`, true);
     console.error(e);
   } finally {
     isSaving = false;
@@ -123,9 +123,9 @@ async function ghSave(action = 'update') {
   }
 }
 
-function syncMsg(msg) {
+function syncMsg(msg, error = false) {
   const el = document.querySelector('.sync-status');
-  if (el) el.textContent = msg;
+  if (el) { el.textContent = msg; el.classList.toggle('error', error); }
 }
 
 // ── Data operations ──────────────────────────────────────────
@@ -726,7 +726,7 @@ async function saveSetup() {
   const msgEl = document.getElementById('setup-msg');
 
   if (!pat || !owner || !repo) {
-    msgEl.style.color = '#c00';
+    msgEl.style.color = '#e03e3e';
     msgEl.textContent = 'All fields required.';
     return;
   }
@@ -739,11 +739,11 @@ async function saveSetup() {
       `https://api.github.com/repos/${owner}/${repo}`,
       { headers: { Authorization: `Bearer ${pat}`, Accept: 'application/vnd.github+json' } }
     );
-    if (res.status === 401) { msgEl.style.color = '#c00'; msgEl.textContent = 'Invalid PAT.'; return; }
-    if (res.status === 404) { msgEl.style.color = '#c00'; msgEl.textContent = 'Not found or no access.'; return; }
-    if (!res.ok)            { msgEl.style.color = '#c00'; msgEl.textContent = `Error: HTTP ${res.status}`; return; }
+    if (res.status === 401) { msgEl.style.color = '#e03e3e'; msgEl.textContent = 'Invalid PAT.'; return; }
+    if (res.status === 404) { msgEl.style.color = '#e03e3e'; msgEl.textContent = 'Not found or no access.'; return; }
+    if (!res.ok)            { msgEl.style.color = '#e03e3e'; msgEl.textContent = `Error: HTTP ${res.status}`; return; }
   } catch {
-    msgEl.style.color = '#c00';
+    msgEl.style.color = '#e03e3e';
     msgEl.textContent = 'Network error.';
     return;
   }
