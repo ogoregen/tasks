@@ -391,19 +391,25 @@ function onDragEnd() {
   );
 }
 
-let autoScrollTimer = null;
+let autoScrollActive = false;
 let autoScrollSpeed = 0;
 
 function tickAutoScroll() {
+  if (!autoScrollActive) return;
   if (autoScrollSpeed !== 0) {
     (document.scrollingElement || document.documentElement).scrollBy(0, autoScrollSpeed);
   }
-  autoScrollTimer = requestAnimationFrame(tickAutoScroll);
+  requestAnimationFrame(tickAutoScroll);
 }
 
 function clearAutoScroll() {
-  if (autoScrollTimer) { cancelAnimationFrame(autoScrollTimer); autoScrollTimer = null; }
+  autoScrollActive = false;
   autoScrollSpeed = 0;
+}
+
+function startAutoScroll(speed) {
+  autoScrollSpeed = speed;
+  if (!autoScrollActive) { autoScrollActive = true; requestAnimationFrame(tickAutoScroll); }
 }
 
 function onTouchDragStart(e, id) {
@@ -419,14 +425,12 @@ function onTouchDragMove(e) {
   e.preventDefault();
   const touch = e.touches[0];
 
-  const edgeSize = 80, maxSpeed = 8;
+  const edgeSize = 80, maxSpeed = 4;
   const y = touch.clientY, vh = window.innerHeight;
   if (y < edgeSize) {
-    autoScrollSpeed = -maxSpeed * (1 - y / edgeSize);
-    if (!autoScrollTimer) autoScrollTimer = requestAnimationFrame(tickAutoScroll);
+    startAutoScroll(-maxSpeed * (1 - y / edgeSize));
   } else if (y > vh - edgeSize) {
-    autoScrollSpeed = maxSpeed * (1 - (vh - y) / edgeSize);
-    if (!autoScrollTimer) autoScrollTimer = requestAnimationFrame(tickAutoScroll);
+    startAutoScroll(maxSpeed * (1 - (vh - y) / edgeSize));
   } else {
     clearAutoScroll();
   }
