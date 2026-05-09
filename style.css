@@ -550,6 +550,7 @@ header {
   .item.touch-sel .item-btns { display: flex; }
   .item.touch-sel .drag-handle { display: inline; }
   .item.touch-sel .item-tag { display: none; }
+  .item.touch-sel { touch-action: none; }
 }
 
 .tag-edit-wrap {
