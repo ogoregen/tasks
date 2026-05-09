@@ -228,12 +228,12 @@ header {
 .item:hover { background: rgba(55,53,47,0.04); }
 
 .item.dragging { opacity: 0.4; }
-.item { position: relative; }
+.item { position: relative; isolation: isolate; }
 .item.drag-over-top::before,
 .item.drag-over-bottom::after {
   content: '';
   position: absolute;
-  left: 0; right: 0;
+  left: 6px; right: 0;
   height: 2px;
   background: #37352f;
   border-radius: 0;
@@ -357,10 +357,13 @@ header {
 .item-del:hover { background: rgba(235,87,87,0.1); color: #e03e3e; }
 
 .drag-handle {
+  position: absolute;
+  left: 2px;
+  top: 50%;
+  transform: translateY(-50%);
   color: rgba(55,53,47,0.3);
   cursor: grab;
   user-select: none;
-  flex-shrink: 0;
   font-size: 13px;
   line-height: 1;
   touch-action: none;
@@ -539,18 +542,29 @@ header {
 .btn-tag-edit:hover { background: rgba(55,53,47,0.08); color: #37352f; }
 
 @media (hover: hover) {
+  .item { margin-left: -28px; padding-left: 28px; }
+  .item:hover { background: none; }
+  .item:hover:not(.drag-over-top):not(.drag-over-bottom)::after {
+    content: '';
+    position: absolute;
+    left: 18px; right: 0; top: 0; bottom: 0;
+    background: rgba(55,53,47,0.04);
+    border-radius: 4px;
+    z-index: -1;
+  }
+  .item.drag-over-top::before,
+  .item.drag-over-bottom::after { left: 28px; }
   .item-btns, .drag-handle { display: none; }
   .item:hover .item-btns { display: flex; }
   .item:hover .drag-handle { display: inline; }
   .item:hover .item-tag { display: none; }
 }
 @media (hover: none) {
-
   .item-btns, .drag-handle { display: none; }
   .item.touch-sel .item-btns { display: flex; }
   .item.touch-sel .drag-handle { display: inline; }
   .item.touch-sel .item-tag { display: none; }
-  .item.touch-sel { touch-action: none; }
+  .item.touch-sel { touch-action: none; padding-left: 28px; }
 }
 
 .tag-edit-wrap {
