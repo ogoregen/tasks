@@ -391,6 +391,12 @@ function onDragEnd() {
   );
 }
 
+let autoScrollTimer = null;
+
+function clearAutoScroll() {
+  if (autoScrollTimer) { clearInterval(autoScrollTimer); autoScrollTimer = null; }
+}
+
 function onTouchDragStart(e, id) {
   draggedId = id;
   document.querySelector(`.item[data-id="${id}"]`)?.classList.add('dragging');
@@ -400,6 +406,17 @@ function onTouchDragMove(e) {
   if (!draggedId) return;
   e.preventDefault();
   const touch = e.touches[0];
+
+  clearAutoScroll();
+  const edgeSize = 80, maxSpeed = 8;
+  const y = touch.clientY, vh = window.innerHeight;
+  if (y < edgeSize) {
+    const speed = maxSpeed * (1 - y / edgeSize);
+    autoScrollTimer = setInterval(() => window.scrollBy(0, -speed), 16);
+  } else if (y > vh - edgeSize) {
+    const speed = maxSpeed * (1 - (vh - y) / edgeSize);
+    autoScrollTimer = setInterval(() => window.scrollBy(0, speed), 16);
+  }
   const draggedEl = document.querySelector(`.item[data-id="${draggedId}"]`);
   if (draggedEl) draggedEl.style.visibility = 'hidden';
   const target = document.elementFromPoint(touch.clientX, touch.clientY);
@@ -416,6 +433,7 @@ function onTouchDragMove(e) {
 }
 
 function onTouchDragEnd(e) {
+  clearAutoScroll();
   if (!draggedId) return;
   const touch = e.changedTouches[0];
   const draggedEl = document.querySelector(`.item[data-id="${draggedId}"]`);

@@ -363,6 +363,7 @@ header {
   flex-shrink: 0;
   font-size: 13px;
   line-height: 1;
+  touch-action: none;
 }
 .drag-handle:active { cursor: grabbing; }
 
