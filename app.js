@@ -202,6 +202,49 @@ function cancelTitleEdit() {
   render();
 }
 
+function showTitlePopup(event, id) {
+  event.stopPropagation();
+  closeTitlePopup();
+  const item = data.items.find(i => i.id === id);
+  if (!item) return;
+  const popup = document.createElement('div');
+  popup.className = 'title-popup';
+  popup.textContent = item.title;
+  document.body.appendChild(popup);
+  const itemEl = event.currentTarget.closest('.item');
+  const rect = (itemEl || event.currentTarget).getBoundingClientRect();
+  popup.style.width = rect.width + 'px';
+  const ph = popup.offsetHeight;
+  let top = rect.bottom + 4;
+  if (top + ph > window.innerHeight - 8) top = rect.top - ph - 4;
+  popup.style.top = Math.max(8, top) + 'px';
+  popup.style.left = rect.left + 'px';
+  const closeOnClick = e => {
+    if (!popup.contains(e.target)) { closeTitlePopup(); document.removeEventListener('click', closeOnClick); }
+  };
+  const closeOnKey = e => { if (e.key === 'Escape') { closeTitlePopup(); document.removeEventListener('keydown', closeOnKey); } };
+  setTimeout(() => document.addEventListener('click', closeOnClick), 0);
+  document.addEventListener('keydown', closeOnKey);
+}
+
+function closeTitlePopup() {
+  document.querySelectorAll('.title-popup').forEach(el => el.remove());
+}
+
+function checkTruncation() {
+  document.querySelectorAll('.btn-expand').forEach(btn => { btn.style.display = 'none'; });
+  document.querySelectorAll('.item-title:not([contenteditable])').forEach(el => {
+    const btn = el.nextElementSibling;
+    if (!btn || !btn.classList.contains('btn-expand')) return;
+    if (el.scrollWidth > el.offsetWidth) {
+      btn.style.display = 'inline-flex';
+      el.classList.add('is-truncated');
+    } else {
+      el.classList.remove('is-truncated');
+    }
+  });
+}
+
 function toggleAddTag(tag) {
   const inp = document.getElementById('inp-tags');
   if (!inp) return;
@@ -405,7 +448,6 @@ function itemHTML(item) {
        </div>`
     : `<div class="item-tags">
          ${item.tags.map(t => `<span class="item-tag${activeTag===t?' active':''}">${esc(t)}</span>`).join('')}
-         <button class="btn-tag-edit" onclick="startTagEdit('${item.id}')">#</button>
        </div>`;
 
   return `
@@ -419,9 +461,11 @@ function itemHTML(item) {
         ? `<div class="item-title-wrap"><span id="titleedit-${item.id}" class="item-title" contenteditable="true" spellcheck="false"
                   onkeydown="if(event.key==='Enter'){event.preventDefault();setTitle('${item.id}',this.textContent.trim());}if(event.key==='Escape')cancelTitleEdit();"
                   onblur="setTitle('${item.id}',this.textContent.trim())">${esc(item.title)}</span><button class="btn-title-done" onmousedown="event.preventDefault()" onclick="setTitle('${item.id}',document.getElementById('titleedit-${item.id}').textContent.trim())">✓</button></div>`
-        : `<div class="item-title-wrap"><span class="item-title">${esc(item.title)}</span><button class="btn-title-edit" onclick="startTitleEdit('${item.id}')">✎</button></div>`}
+        : `<div class="item-title-wrap"><span class="item-title">${esc(item.title)}</span><button class="btn-expand" onclick="showTitlePopup(event,'${item.id}')">[…]</button></div>`}
       ${tagsArea}
       <div class="item-btns">
+        <button class="btn-title-edit" onclick="startTitleEdit('${item.id}')">✎</button>
+        <button class="btn-tag-edit" onclick="startTagEdit('${item.id}')">#</button>
         <button class="item-del" onclick="confirmDelete(this,'${item.id}')">×</button>
       </div>
       <span class="drag-handle" draggable="true"
@@ -523,6 +567,7 @@ function render() {
   if (touchSelId) {
     document.querySelector(`.item[data-id="${touchSelId}"]`)?.classList.add('touch-sel');
   }
+  checkTruncation();
 }
 
 function startAdd() {

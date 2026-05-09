@@ -255,6 +255,11 @@ header {
   white-space: nowrap;
   min-width: 0;
 }
+.item-title.is-truncated {
+  text-overflow: clip;
+  -webkit-mask-image: linear-gradient(to right, black calc(100% - 16px), transparent 100%);
+  mask-image: linear-gradient(to right, black calc(100% - 16px), transparent 100%);
+}
 .item-title[contenteditable] { flex: 1; outline: none; cursor: text; border-bottom: 1.5px solid rgba(55,53,47,0.3); }
 .btn-title-edit {
   background: none;
@@ -292,6 +297,39 @@ header {
   transition: background 0.1s, color 0.1s;
 }
 .btn-title-done:hover { background: rgba(55,53,47,0.08); color: #37352f; }
+
+.btn-expand {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 10px;
+  color: rgba(55,53,47,0.4);
+  padding: 0;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  font-family: inherit;
+  border-radius: 3px;
+  align-items: center;
+  justify-content: center;
+  margin-left: 2px;
+}
+.btn-expand:hover { color: #37352f; background: rgba(55,53,47,0.06); }
+
+.title-popup {
+  position: fixed;
+  background: #fff;
+  border: 1px solid rgba(55,53,47,0.15);
+  border-radius: 4px;
+  padding: 8px 12px;
+  font-size: 14px;
+  color: #37352f;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  z-index: 1000;
+  user-select: text;
+  word-break: break-word;
+}
 
 .item-btns {
   display: flex;
@@ -501,20 +539,16 @@ header {
 
 @media (hover: hover) {
   .item-btns, .drag-handle { display: none; }
-  .btn-tag-edit, .btn-title-edit { display: none; }
   .item:hover .item-btns { display: flex; }
   .item:hover .drag-handle { display: inline; }
-  .item:hover .btn-tag-edit { display: inline-flex; }
-  .item:hover .btn-title-edit { display: inline-flex; }
+  .item:hover .item-tag { display: none; }
 }
 @media (hover: none) {
 
   .item-btns, .drag-handle { display: none; }
-  .btn-tag-edit, .btn-title-edit { display: none; }
   .item.touch-sel .item-btns { display: flex; }
-  .item.touch-sel .btn-tag-edit { display: inline-flex; }
-  .item.touch-sel .btn-title-edit { display: inline-flex; }
   .item.touch-sel .drag-handle { display: inline; }
+  .item.touch-sel .item-tag { display: none; }
 }
 
 .tag-edit-wrap {
