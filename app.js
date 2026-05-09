@@ -208,6 +208,8 @@ function cancelTitleEdit() {
   render();
 }
 
+let _popupCleanup = null;
+
 function showTitlePopup(event, id) {
   event.stopPropagation();
   closeTitlePopup();
@@ -225,16 +227,23 @@ function showTitlePopup(event, id) {
   if (top + ph > window.innerHeight - 8) top = rect.top - ph - 4;
   popup.style.top = Math.max(8, top) + 'px';
   popup.style.left = rect.left + 'px';
-  const closeOnClick = e => {
-    if (!popup.contains(e.target)) { closeTitlePopup(); document.removeEventListener('click', closeOnClick); }
+  const onOutside = e => { if (!popup.contains(e.target)) closeTitlePopup(); };
+  const onKey = e => { if (e.key === 'Escape') closeTitlePopup(); };
+  setTimeout(() => {
+    document.addEventListener('click', onOutside);
+    document.addEventListener('touchstart', onOutside, true);
+    document.addEventListener('keydown', onKey);
+  }, 0);
+  _popupCleanup = () => {
+    document.removeEventListener('click', onOutside);
+    document.removeEventListener('touchstart', onOutside, true);
+    document.removeEventListener('keydown', onKey);
   };
-  const closeOnKey = e => { if (e.key === 'Escape') { closeTitlePopup(); document.removeEventListener('keydown', closeOnKey); } };
-  setTimeout(() => document.addEventListener('click', closeOnClick), 0);
-  document.addEventListener('keydown', closeOnKey);
 }
 
 function closeTitlePopup() {
   document.querySelectorAll('.title-popup').forEach(el => el.remove());
+  if (_popupCleanup) { _popupCleanup(); _popupCleanup = null; }
 }
 
 function checkTruncation() {
