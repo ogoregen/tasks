@@ -731,7 +731,7 @@ async function saveSetup() {
       { headers: { Authorization: `Bearer ${pat}`, Accept: 'application/vnd.github+json' } }
     );
     if (res.status === 401) { msgEl.style.color = '#c00'; msgEl.textContent = 'Invalid PAT.'; return; }
-    if (res.status === 404) { msgEl.style.color = '#c00'; msgEl.textContent = 'Not found or no access — GitHub returns 404 for private repos the token cannot see. Ensure the PAT has Contents: read/write on this repo.'; return; }
+    if (res.status === 404) { msgEl.style.color = '#c00'; msgEl.textContent = 'Not found or no access.'; return; }
     if (!res.ok)            { msgEl.style.color = '#c00'; msgEl.textContent = `Error: HTTP ${res.status}`; return; }
   } catch {
     msgEl.style.color = '#c00';
