@@ -424,11 +424,17 @@ function onTouchDragMove(e) {
   document.querySelectorAll('.item').forEach(el =>
     el.classList.remove('drag-over-top', 'drag-over-bottom')
   );
+  document.querySelectorAll('.section-drag-over').forEach(el =>
+    el.classList.remove('section-drag-over')
+  );
   if (!target) return;
   const item = target.closest('.item');
   if (item && item.dataset.id !== draggedId) {
     const rect = item.getBoundingClientRect();
     item.classList.add(touch.clientY < rect.top + rect.height / 2 ? 'drag-over-top' : 'drag-over-bottom');
+  } else {
+    const section = target.closest('[data-status]');
+    if (section) section.classList.add('section-drag-over');
   }
 }
 
