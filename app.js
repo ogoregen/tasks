@@ -519,6 +519,9 @@ function itemHTML(item) {
          ondragleave="onDragLeave(event)"
          ondrop="onDrop(event,'${item.id}')"
          ondragend="onDragEnd()">
+      <span class="drag-handle" draggable="true"
+            ondragstart="onDragStart(event,'${item.id}')"
+            ontouchstart="onTouchDragStart(event,'${item.id}')">⠿</span>
       ${editingTitleFor === item.id
         ? `<div class="item-title-wrap"><span id="titleedit-${item.id}" class="item-title" contenteditable="true" spellcheck="false"
                   onkeydown="if(event.key==='Enter'){event.preventDefault();setTitle('${item.id}',this.textContent.trim());}if(event.key==='Escape')cancelTitleEdit();"
@@ -530,9 +533,6 @@ function itemHTML(item) {
         <button class="btn-tag-edit" onclick="startTagEdit('${item.id}')">#</button>
         <button class="item-del" onclick="confirmDelete(this,'${item.id}')">×</button>
       </div>
-      <span class="drag-handle" draggable="true"
-            ondragstart="onDragStart(event,'${item.id}')"
-            ontouchstart="onTouchDragStart(event,'${item.id}')">⠿</span>
     </div>`;
 }
 
