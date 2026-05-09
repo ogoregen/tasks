@@ -13,6 +13,7 @@ let isAdding    = false;
 let newStatus      = 'progress';
 let isSaving       = false;
 let needsSave      = false;
+let savedSnapshot  = null;
 let draggedId      = null;
 let activeTag      = null;
 let editingTagsFor  = null;
@@ -90,6 +91,7 @@ async function ghLoad() {
 }
 
 async function ghSave(action = 'update') {
+  if (JSON.stringify(data) === savedSnapshot) return;
   if (isSaving) { needsSave = true; return; }
   isSaving = true;
   syncMsg('saving…');
@@ -109,6 +111,7 @@ async function ghSave(action = 'update') {
     }
     const j = await res.json();
     fileSha = j.content.sha;
+    savedSnapshot = JSON.stringify(data);
     syncMsg('Saved');
     setTimeout(() => syncMsg(''), 2000);
   } catch (e) {
@@ -639,6 +642,7 @@ async function init() {
   try {
     const fresh = await ghLoad();
     data = fresh !== null ? fresh : { items: [] };
+    savedSnapshot = JSON.stringify(data);
     render();
   } catch (e) {
     document.getElementById('app').innerHTML =
