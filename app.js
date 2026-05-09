@@ -229,15 +229,18 @@ function showTitlePopup(event, id) {
   popup.style.left = rect.left + 'px';
   const onOutside = e => { if (!popup.contains(e.target)) closeTitlePopup(); };
   const onKey = e => { if (e.key === 'Escape') closeTitlePopup(); };
+  const onScroll = () => closeTitlePopup();
   setTimeout(() => {
     document.addEventListener('click', onOutside);
     document.addEventListener('touchstart', onOutside, true);
     document.addEventListener('keydown', onKey);
+    document.addEventListener('scroll', onScroll, true);
   }, 0);
   _popupCleanup = () => {
     document.removeEventListener('click', onOutside);
     document.removeEventListener('touchstart', onOutside, true);
     document.removeEventListener('keydown', onKey);
+    document.removeEventListener('scroll', onScroll, true);
   };
 }
 
