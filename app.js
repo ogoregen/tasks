@@ -515,8 +515,11 @@ function pickStatus(s) {
 }
 
 function itemHTML(item) {
-  const tagsArea = editingTagsFor === item.id
+  const tagsArea = editingTitleFor === item.id
+    ? ''
+    : editingTagsFor === item.id
     ? `<div class="tag-edit-wrap">
+         <span class="tag-edit-label">Tags</span>
          <input id="tagedit-${item.id}" class="tag-edit-input"
                 value="${esc(item.tags.join(', '))}" placeholder="tag1, tag2"
                 onkeydown="if(event.key==='Enter')setTags('${item.id}',this.value);if(event.key==='Escape')cancelTagEdit()"
@@ -543,11 +546,11 @@ function itemHTML(item) {
                   onblur="setTitle('${item.id}',this.textContent.trim())">${esc(item.title)}</span><button class="btn-title-done" onmousedown="event.preventDefault()" onclick="setTitle('${item.id}',document.getElementById('titleedit-${item.id}').textContent.trim())">✓</button></div>`
         : `<div class="item-title-wrap"><span class="item-title">${esc(item.title)}</span><button class="btn-expand" onclick="showTitlePopup(event,'${item.id}')">[…]</button></div>`}
       ${tagsArea}
-      <div class="item-btns">
+      ${editingTagsFor === item.id || editingTitleFor === item.id ? '' : `<div class="item-btns">
         <button class="btn-title-edit" onclick="startTitleEdit('${item.id}')">✎</button>
         <button class="btn-tag-edit" onclick="startTagEdit('${item.id}')">#</button>
         <button class="item-del" onclick="confirmDelete(this,'${item.id}')">×</button>
-      </div>
+      </div>`}
     </div>`;
 }
 

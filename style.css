@@ -596,19 +596,27 @@ header {
   display: flex;
   align-items: center;
   gap: 6px;
+}
+
+.tag-edit-label {
+  font-size: 11px;
+  color: rgba(55,53,47,0.35);
   flex-shrink: 0;
 }
 
+.item:has(.tag-edit-input) .item-title-wrap { display: none; }
+.item:has(.tag-edit-input) .tag-edit-wrap { flex: 1; }
+
 .tag-edit-input {
+  flex: 1;
   border: none;
   outline: none;
-  font-size: 11px;
+  border-bottom: 1.5px solid rgba(55,53,47,0.3);
+  background: none;
+  font-size: 14px;
   font-family: inherit;
   color: #37352f;
-  background: rgba(55,53,47,0.06);
-  border-radius: 3px;
-  padding: 3px 8px;
-  width: 160px;
+  padding: 2px 0;
 }
 
 .btn-tag-save {
