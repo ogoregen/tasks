@@ -221,12 +221,14 @@ function showTitlePopup(event, id) {
   document.body.appendChild(popup);
   const itemEl = event.currentTarget.closest('.item');
   const rect = (itemEl || event.currentTarget).getBoundingClientRect();
-  popup.style.width = rect.width + 'px';
+  const sectionEl = itemEl?.closest('.section');
+  const anchorRect = sectionEl ? sectionEl.getBoundingClientRect() : rect;
+  popup.style.width = anchorRect.width + 'px';
   const ph = popup.offsetHeight;
   let top = rect.bottom + 4;
   if (top + ph > window.innerHeight - 8) top = rect.top - ph - 4;
   popup.style.top = Math.max(8, top) + 'px';
-  popup.style.left = rect.left + 'px';
+  popup.style.left = anchorRect.left + 'px';
   const onOutside = e => { if (!popup.contains(e.target)) closeTitlePopup(); };
   const onKey = e => { if (e.key === 'Escape') closeTitlePopup(); };
   const onScroll = () => closeTitlePopup();
