@@ -519,7 +519,8 @@ function itemHTML(item) {
     ? `<div class="tag-edit-wrap">
          <input id="tagedit-${item.id}" class="tag-edit-input"
                 value="${esc(item.tags.join(', '))}" placeholder="tag1, tag2"
-                onkeydown="if(event.key==='Enter')setTags('${item.id}',this.value);if(event.key==='Escape')cancelTagEdit()">
+                onkeydown="if(event.key==='Enter')setTags('${item.id}',this.value);if(event.key==='Escape')cancelTagEdit()"
+                onblur="cancelTagEdit()">
          <button class="btn-tag-save" onmousedown="event.preventDefault()" onclick="setTags('${item.id}',document.getElementById('tagedit-${item.id}').value)">✓</button>
        </div>`
     : `<div class="item-tags">
