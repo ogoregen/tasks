@@ -581,7 +581,7 @@ header {
   .item:hover .item-tag { display: none; }
 }
 @media (hover: none) {
-  header { background: #f1f1ef; }
+  header { background: #e8e7e4; }
   .item-btns, .drag-handle { display: none; }
   .item.touch-sel .item-btns { display: flex; }
   .item.touch-sel .drag-handle { display: inline-flex; position: static; transform: none; top: auto; }
