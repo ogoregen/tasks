@@ -591,24 +591,28 @@ function render() {
   document.title = title;
   document.getElementById('app').innerHTML = `
     <header>
-      <span class="site-title">${esc(title)}</span>
-      <div class="header-right">
-        <span class="sync-status"></span>
-        <button class="btn-new" onclick="startAdd()">+ New</button>
-        <button class="btn-gear" onclick="document.querySelector('.setup-card') ? render() : showSetup()" title="settings">⚙</button>
+      <div class="header-inner">
+        <span class="site-title">${esc(title)}</span>
+        <div class="header-right">
+          <span class="sync-status"></span>
+          <button class="btn-new" onclick="startAdd()">+ New</button>
+          <button class="btn-gear" onclick="document.querySelector('.setup-card') ? render() : showSetup()" title="settings">⚙</button>
+        </div>
       </div>
     </header>
-    ${isAdding ? addFormHTML() : ''}
-    ${(()=>{
-      const tags = allTags();
-      if (!tags.length) return '';
-      return `<div class="tag-cloud">
-        <span class="tag-cloud-label">Tags</span>
-        ${tags.map(t => `<span class="tag${activeTag===t?' active':''}" onclick="filterByTag('${esc(t)}')">${esc(t)}</span>`).join('')}
-      </div>`;
-    })()}
-    ${STATUSES.map(sectionHTML).join('')}
-    <div class="page-end">· · ·</div>`;
+    <div class="content">
+      ${isAdding ? addFormHTML() : ''}
+      ${(()=>{
+        const tags = allTags();
+        if (!tags.length) return '';
+        return `<div class="tag-cloud">
+          <span class="tag-cloud-label">Tags</span>
+          ${tags.map(t => `<span class="tag${activeTag===t?' active':''}" onclick="filterByTag('${esc(t)}')">${esc(t)}</span>`).join('')}
+        </div>`;
+      })()}
+      ${STATUSES.map(sectionHTML).join('')}
+      <div class="page-end">· · ·</div>
+    </div>`;
 
   if (isAdding) {
     const inp    = document.getElementById('inp-title');
@@ -677,11 +681,14 @@ function showSetup() {
   document.title = title;
   document.getElementById('app').innerHTML = `
     <header>
-      <span class="site-title">${esc(title)}</span>
-      <div class="header-right">
-        <button class="btn-gear" onclick="document.querySelector('.setup-card') ? render() : showSetup()" title="settings">⚙</button>
+      <div class="header-inner">
+        <span class="site-title">${esc(title)}</span>
+        <div class="header-right">
+          <button class="btn-gear" onclick="document.querySelector('.setup-card') ? render() : showSetup()" title="settings">⚙</button>
+        </div>
       </div>
     </header>
+    <div class="content">
     <div class="setup-card">
       <div class="setup-head">Setup</div>
       <p class="setup-desc">
@@ -709,6 +716,7 @@ function showSetup() {
         ${config ? `<button class="btn-back" onclick="render()">Cancel</button>` : ''}
       </div>
       <div class="setup-msg" id="setup-msg"></div>
+    </div>
     </div>`;
 
   document.getElementById('s-title').focus();
@@ -761,7 +769,7 @@ async function init() {
 
   if (!config) { showSetup(); return; }
 
-  document.getElementById('app').innerHTML = '<div class="loading">Loading…</div>';
+  document.getElementById('app').innerHTML = '<div class="content"><div class="loading">Loading…</div></div>';
 
   try {
     const fresh = await ghLoad();
@@ -770,7 +778,7 @@ async function init() {
     render();
   } catch (e) {
     document.getElementById('app').innerHTML =
-      `<div class="loading">Failed to load: ${esc(e.message)}<br><br><button class="btn-submit" onclick="showSetup()">Settings</button></div>`;
+      `<div class="content"><div class="loading">Failed to load: ${esc(e.message)}<br><br><button class="btn-submit" onclick="showSetup()">Settings</button></div></div>`;
   }
 }
 
