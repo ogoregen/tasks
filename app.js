@@ -780,7 +780,7 @@ async function init() {
     render();
   } catch (e) {
     document.getElementById('app').innerHTML =
-      `<div class="content"><div class="loading">Failed to load: ${esc(e.message)}<br><br><button class="btn-submit" onclick="showSetup()">Settings</button></div></div>`;
+      `<div class="content"><div class="loading"><div>Failed to load: ${esc(e.message)}<button class="btn-submit" style="margin-top:16px;display:block" onclick="showSetup()">Settings</button></div></div></div>`;
   }
 }
 
