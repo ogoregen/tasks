@@ -228,7 +228,7 @@ header {
 
 .section.section-drag-over {
   outline: 2px dashed rgba(55,53,47,0.25);
-  outline-offset: 2px;
+  outline-offset: 7px;
   border-radius: 6px;
 }
 
