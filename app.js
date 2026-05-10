@@ -1,6 +1,7 @@
 'use strict';
 
-const CFG_KEY = 'db_config';
+const CFG_KEY  = 'db_config';
+const DATA_KEY = 'db_data';
 
 const STATUSES     = ['progress', 'backlog', 'want', 'done'];
 const ADD_STATUSES = ['progress', 'backlog', 'want'];
@@ -9,6 +10,7 @@ const LABELS       = { progress: 'In Progress', backlog: 'Backlog', want: 'Want'
 let config      = null;
 let data        = { items: [] };
 let fileSha     = null;
+let isOffline   = false;
 let isAdding    = false;
 let newStatus      = 'progress';
 let isSaving       = false;
@@ -87,10 +89,13 @@ async function ghLoad() {
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const j = await res.json();
   fileSha = j.sha;
-  return normalize(JSON.parse(b64dec(j.content.replace(/\s/g, ''))));
+  const d = normalize(JSON.parse(b64dec(j.content.replace(/\s/g, ''))));
+  localStorage.setItem(DATA_KEY, JSON.stringify({ data: d, sha: j.sha }));
+  return d;
 }
 
 async function ghSave(action = 'update') {
+  if (isOffline) return;
   if (JSON.stringify(data) === savedSnapshot) return;
   if (isSaving) { needsSave = true; return; }
   isSaving = true;
@@ -112,6 +117,7 @@ async function ghSave(action = 'update') {
     const j = await res.json();
     fileSha = j.content.sha;
     savedSnapshot = JSON.stringify(data);
+    localStorage.setItem(DATA_KEY, JSON.stringify({ data, sha: fileSha }));
     syncMsg('Saved');
     setTimeout(() => syncMsg(''), 2000);
   } catch (e) {
@@ -530,24 +536,19 @@ function itemHTML(item) {
   return `
     <div class="item" data-id="${item.id}"
          onclick="touchSelect('${item.id}',event)"
-         ondragover="onDragOver(event,'${item.id}')"
-         ondragleave="onDragLeave(event)"
-         ondrop="onDrop(event,'${item.id}')"
-         ondragend="onDragEnd()">
-      <span class="drag-handle" draggable="true"
-            ondragstart="onDragStart(event,'${item.id}')"
-            ontouchstart="onTouchDragStart(event,'${item.id}')">⠿</span>
+         ${isOffline ? '' : `ondragover="onDragOver(event,'${item.id}')" ondragleave="onDragLeave(event)" ondrop="onDrop(event,'${item.id}')" ondragend="onDragEnd()"`}>
+      ${isOffline ? '' : `<span class="drag-handle" draggable="true" ondragstart="onDragStart(event,'${item.id}')" ontouchstart="onTouchDragStart(event,'${item.id}')">⠿</span>`}
       ${editingTitleFor === item.id
         ? `<div class="item-title-wrap"><span id="titleedit-${item.id}" class="item-title" contenteditable="true" spellcheck="false"
                   onkeydown="if(event.key==='Enter'){event.preventDefault();setTitle('${item.id}',this.textContent.trim());}if(event.key==='Escape')cancelTitleEdit();"
                   onblur="setTitle('${item.id}',this.textContent.trim())">${esc(item.title)}</span><button class="btn-title-done" onmousedown="event.preventDefault()" onclick="setTitle('${item.id}',document.getElementById('titleedit-${item.id}').textContent.trim())">✓</button></div>`
         : `<div class="item-title-wrap"><span class="item-title">${esc(item.title)}</span><button class="btn-expand" onclick="showTitlePopup(event,'${item.id}')">[…]</button></div>`}
       ${tagsArea}
-      <div class="item-btns">
+      ${isOffline ? '' : `<div class="item-btns">
         <button class="btn-title-edit" onclick="startTitleEdit('${item.id}')">✎</button>
         <button class="btn-tag-edit" onclick="startTagEdit('${item.id}')">#</button>
         <button class="item-del" onclick="confirmDelete(this,'${item.id}')">×</button>
-      </div>
+      </div>`}
     </div>`;
 }
 
@@ -555,9 +556,7 @@ function sectionHTML(status) {
   const items = data.items.filter(i => i.status === status && (!activeTag || i.tags.includes(activeTag)));
   return `
     <div class="section" data-status="${status}"
-         ondragover="onSectionDragOver(event,'${status}')"
-         ondragleave="onSectionDragLeave(event)"
-         ondrop="onSectionDrop(event,'${status}')">
+         ${isOffline ? '' : `ondragover="onSectionDragOver(event,'${status}')" ondragleave="onSectionDragLeave(event)" ondrop="onSectionDrop(event,'${status}')"`}>
       <div class="section-head">
         <span class="section-title">${LABELS[status]}</span>
         <span class="section-count">${items.length}</span>
@@ -597,7 +596,7 @@ function render() {
         <span class="site-title">${esc(title)}</span>
         <div class="header-right">
           <span class="sync-status"></span>
-          <button class="btn-new" onclick="startAdd()">+ New</button>
+          ${isOffline ? '' : '<button class="btn-new" onclick="startAdd()">+ New</button>'}
           <button class="btn-gear" onclick="document.querySelector('.setup-card') ? render() : showSetup()" title="settings">⚙</button>
         </div>
       </div>
@@ -779,6 +778,18 @@ async function init() {
     savedSnapshot = JSON.stringify(data);
     render();
   } catch (e) {
+    try {
+      const cached = JSON.parse(localStorage.getItem(DATA_KEY));
+      if (cached) {
+        data = cached.data;
+        fileSha = cached.sha;
+        savedSnapshot = JSON.stringify(data);
+        isOffline = true;
+        render();
+        syncMsg('Offline');
+        return;
+      }
+    } catch {}
     document.getElementById('app').innerHTML =
       `<div class="content"><div class="loading">Failed to load: ${esc(e.message)}<br><br><button class="btn-submit" onclick="showSetup()">Settings</button></div></div>`;
   }
