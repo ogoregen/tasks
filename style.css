@@ -108,16 +108,16 @@ header {
 
 /* ── Add form ── */
 .add-form {
-  background: rgba(55,53,47,0.03);
+  border: 1px solid rgba(55,53,47,0.12);
   border-radius: 6px;
-  padding: 12px 14px;
+  padding: 16px 18px;
   margin-bottom: 20px;
 }
 
 .status-picker {
   display: flex;
   gap: 4px;
-  margin-bottom: 10px;
+  margin-bottom: 14px;
 }
 
 .spick {
@@ -140,16 +140,16 @@ header {
   width: 100%;
   border: none;
   outline: none;
-  font-size: 14px;
+  font-size: 16px;
   font-family: inherit;
   color: #37352f;
   background: transparent;
-  padding: 4px 0;
-  margin-bottom: 10px;
+  padding: 6px 0;
+  margin-bottom: 14px;
 }
 .add-input::placeholder { color: rgba(55,53,47,0.3); }
 
-.add-btns { display: flex; gap: 6px; margin-top: 12px; }
+.add-btns { display: flex; gap: 6px; margin-top: 16px; }
 
 .btn-submit {
   background: #37352f;
@@ -660,8 +660,8 @@ header {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   padding: 0;
-  margin-bottom: 10px;
+  margin-bottom: 0;
   cursor: text;
 }
