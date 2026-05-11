@@ -524,12 +524,12 @@ function itemHTML(item) {
                   onkeydown="if(event.key==='Enter'){event.preventDefault();setTitle('${item.id}',this.textContent.trim());}if(event.key==='Escape')cancelTitleEdit();"
                   onblur="setTitle('${item.id}',this.textContent.trim())">${esc(item.title)}</span><button class="btn-title-done" onmousedown="event.preventDefault()" onclick="setTitle('${item.id}',document.getElementById('titleedit-${item.id}').textContent.trim())">✓</button></div>`
         : `<div class="item-title-wrap"><span class="item-title">${esc(item.title)}</span><button class="btn-expand" onclick="showTitlePopup(event,'${item.id}')">[…]</button></div>`}
-      ${tagsArea}
       ${editingTagsFor === item.id || editingTitleFor === item.id ? '' : `<div class="item-btns">
         <button class="btn-title-edit" onclick="startTitleEdit('${item.id}')">✎</button>
         <button class="btn-tag-edit" onclick="startTagEdit('${item.id}')">#</button>
         <button class="item-del${deletePendingId === item.id ? ' pending' : ''}" onclick="confirmDelete('${item.id}')">${deletePendingId === item.id ? '×?' : '×'}</button>
       </div>`}
+      ${tagsArea}
     </div>`;
 }
 

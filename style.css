@@ -586,7 +586,6 @@ header {
   .item-btns, .drag-handle { display: none; }
   .item:hover .item-btns, .item.del-pending .item-btns { display: flex; }
   .item:hover .drag-handle, .item.del-pending .drag-handle { display: inline; }
-  .item:hover .item-tag, .item.del-pending .item-tag { display: none; }
   .item.del-pending:not(.drag-over-top):not(.drag-over-bottom)::after {
     content: '';
     position: absolute;
