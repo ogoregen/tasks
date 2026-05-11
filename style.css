@@ -577,9 +577,17 @@ header {
   .item.drag-over-top::before,
   .item.drag-over-bottom::after { left: 28px; }
   .item-btns, .drag-handle { display: none; }
-  .item:hover .item-btns { display: flex; }
-  .item:hover .drag-handle { display: inline; }
-  .item:hover .item-tag { display: none; }
+  .item:hover .item-btns, .item.del-pending .item-btns { display: flex; }
+  .item:hover .drag-handle, .item.del-pending .drag-handle { display: inline; }
+  .item:hover .item-tag, .item.del-pending .item-tag { display: none; }
+  .item.del-pending:not(.drag-over-top):not(.drag-over-bottom)::after {
+    content: '';
+    position: absolute;
+    left: 22px; right: 0; top: 0; bottom: 0;
+    background: rgba(55,53,47,0.04);
+    border-radius: 4px;
+    z-index: -1;
+  }
 }
 @media (hover: none) {
   header { background: #fff; border-bottom: 1px solid rgba(55,53,47,0.1); }

@@ -170,21 +170,6 @@ function cancelTagEdit() {
 
 const isTouch = () => window.matchMedia('(hover: none)').matches;
 
-function touchSelect(id, e) {
-  if (!isTouch()) return;
-  closeTitlePopup();
-  if (touchSelId === id) {
-    document.querySelector(`.item[data-id="${id}"]`)?.classList.remove('touch-sel');
-    touchSelId = null;
-    e.stopPropagation();
-    return;
-  }
-  e.stopPropagation();
-  if (touchSelId) document.querySelector(`.item[data-id="${touchSelId}"]`)?.classList.remove('touch-sel');
-  touchSelId = id;
-  document.querySelector(`.item[data-id="${id}"]`)?.classList.add('touch-sel');
-}
-
 
 function startTitleEdit(id) {
   editingTitleFor = id;
@@ -298,6 +283,8 @@ function confirmDelete(btn, id) {
     btn.style.color = '#e03e3e';
     btn.style.width = 'auto';
     btn.style.padding = '0 6px';
+    const itemEl = btn.closest('.item');
+    itemEl?.classList.add('del-pending');
     setTimeout(() => {
       if (btn.dataset.pending === '1') {
         btn.dataset.pending = '';
@@ -305,6 +292,7 @@ function confirmDelete(btn, id) {
         btn.style.color = '';
         btn.style.width = '';
         btn.style.padding = '';
+        itemEl?.classList.remove('del-pending');
       }
     }, 3000);
   }
@@ -532,7 +520,6 @@ function itemHTML(item) {
 
   return `
     <div class="item" data-id="${item.id}"
-         onclick="touchSelect('${item.id}',event)"
          ondragover="onDragOver(event,'${item.id}')"
          ondragleave="onDragLeave(event)"
          ondrop="onDrop(event,'${item.id}')"
@@ -790,9 +777,20 @@ async function init() {
 init();
 
 document.addEventListener('click', e => {
-  if (touchSelId && !e.target.closest(`.item[data-id="${touchSelId}"]`)) {
+  if (!isTouch()) return;
+  if (e.target.tagName === 'BUTTON') return;
+  closeTitlePopup();
+  const item = e.target.closest('.item');
+  const id = item?.dataset.id;
+  if (touchSelId) {
     document.querySelector(`.item[data-id="${touchSelId}"]`)?.classList.remove('touch-sel');
+    const prev = touchSelId;
     touchSelId = null;
+    if (prev === id) return;
+  }
+  if (id) {
+    touchSelId = id;
+    item.classList.add('touch-sel');
   }
 });
 
