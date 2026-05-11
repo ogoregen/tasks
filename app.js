@@ -270,6 +270,10 @@ function addItem(title, status, tags) {
 
 function deleteItem(id) {
   data.items = data.items.filter(i => i.id !== id);
+  if (activeTag && !data.items.some(i => i.tags.includes(activeTag))) {
+    activeTag = null;
+    localStorage.removeItem('activeTag');
+  }
   ghSave('Delete item');
   render();
 }
