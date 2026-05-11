@@ -147,6 +147,7 @@ function setTags(id, str) {
   if (!item) return;
   item.tags = parseTags(str);
   editingTagsFor = null;
+  touchSelId = null;
   ghSave('Edit tags');
   render();
 }
@@ -160,6 +161,7 @@ function startTagEdit(id) {
 
 function cancelTagEdit() {
   editingTagsFor = null;
+  touchSelId = null;
   render();
 }
 
@@ -180,12 +182,14 @@ function setTitle(id, value) {
   const v = value.trim();
   if (v) item.title = v;
   editingTitleFor = null;
+  touchSelId = null;
   ghSave('Edit title');
   render();
 }
 
 function cancelTitleEdit() {
   editingTitleFor = null;
+  touchSelId = null;
   render();
 }
 
