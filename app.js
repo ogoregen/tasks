@@ -566,10 +566,16 @@ function addFormHTML() {
           <button class="spick${s === newStatus ? ' sel' : ''}" data-s="${s}" onclick="pickStatus('${s}')">${LABELS[s]}</button>
         `).join('')}
       </div>
-      <input id="inp-title" class="add-input" type="text" placeholder="Item" autocomplete="off" spellcheck="false">
+      <div class="add-field-row">
+        <label class="tag-edit-label" for="inp-title">Title</label>
+        <input id="inp-title" class="add-input" type="text" placeholder="Item" autocomplete="off" spellcheck="false">
+      </div>
       <div class="add-tags-row" onclick="document.getElementById('inp-tags').focus()">
         ${allTags().map(tag=>`<span class="tag add-tag-opt" data-tag="${esc(tag)}" onclick="toggleAddTag('${esc(tag)}')">${esc(tag)}</span>`).join('')}
-        <input id="inp-tags" class="add-tags-input" type="text" placeholder="Tag1, Tag2…" autocomplete="off" spellcheck="false">
+        <div class="add-tags-input-row">
+          <label class="tag-edit-label" for="inp-tags">Tags</label>
+          <input id="inp-tags" class="add-tags-input" type="text" placeholder="Tag1, Tag2…" autocomplete="off" spellcheck="false">
+        </div>
       </div>
       <div class="add-btns">
         <button class="btn-submit" onclick="submitAdd()">Add</button>

@@ -121,7 +121,7 @@ header {
 }
 
 .spick {
-  background: none;
+  background: rgba(55,53,47,0.08);
   border: none;
   cursor: pointer;
   font-size: 12px;
@@ -135,9 +135,16 @@ header {
 .spick:hover { background: rgba(55,53,47,0.08); color: #37352f; }
 .spick.sel   { background: #37352f; color: #fff; }
 
+.add-field-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
 .add-input {
-  display: block;
-  width: 100%;
+  flex: 1;
+  min-width: 0;
   border: none;
   outline: none;
   font-size: 16px;
@@ -145,7 +152,6 @@ header {
   color: #37352f;
   background: transparent;
   padding: 6px 0;
-  margin-bottom: 14px;
 }
 .add-input::placeholder { color: rgba(55,53,47,0.3); }
 
@@ -643,9 +649,16 @@ header {
 }
 .btn-tag-save:hover { background: rgba(55,53,47,0.08); color: #37352f; }
 
+.add-tags-input-row {
+  flex-basis: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+
 .add-tags-input {
   flex: 1;
-  min-width: 60px;
   border: none;
   outline: none;
   font-size: 12px;
