@@ -110,7 +110,7 @@ async function ghSave(action = 'update') {
     syncMsg('Saved');
     setTimeout(() => syncMsg(''), 2000);
   } catch (e) {
-    syncMsg(`save failed: ${e.message}`, true);
+    syncMsg('Save failed', true);
     console.error(e);
   } finally {
     isSaving = false;
