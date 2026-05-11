@@ -132,7 +132,7 @@ header {
   color: rgba(55,53,47,0.5);
   transition: background 0.1s, color 0.1s;
 }
-.spick:hover { background: rgba(55,53,47,0.08); color: #37352f; }
+.spick:hover { background: rgba(55,53,47,0.14); color: #37352f; }
 .spick.sel   { background: #37352f; color: #fff; }
 
 .add-field-row {
