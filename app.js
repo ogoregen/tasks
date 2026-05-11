@@ -794,6 +794,12 @@ document.addEventListener('click', e => {
   }
 });
 
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState !== 'hidden') return;
+  if (activeTag) localStorage.setItem('activeTag', activeTag);
+  else localStorage.removeItem('activeTag');
+});
+
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js').catch(() => {});
 }
