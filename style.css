@@ -379,6 +379,7 @@ header {
   transition: background 0.1s, color 0.1s;
 }
 .item-del:hover { background: rgba(235,87,87,0.1); color: #e03e3e; }
+.item-del.pending { color: #e03e3e; width: auto; padding: 0 6px; }
 
 .drag-handle {
   position: absolute;

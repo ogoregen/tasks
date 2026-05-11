@@ -19,6 +19,7 @@ let activeTag      = null;
 let editingTagsFor  = null;
 let editingTitleFor = null;
 let touchSelId      = null;
+let deletePendingId = null;
 
 // ── Utilities ────────────────────────────────────────────────
 
@@ -58,7 +59,7 @@ async function ghFetch(path, opts = {}) {
       headers: {
         Authorization: `Bearer ${config.pat}`,
         Accept: 'application/vnd.github+json',
-        'Content-Type': 'application/json',
+        ...(opts.method ? { 'Content-Type': 'application/json' } : {}),
         ...(opts.headers || {})
       }
     }
@@ -67,13 +68,7 @@ async function ghFetch(path, opts = {}) {
 
 function normalize(d) {
   if (!d) return { items: [] };
-  let items;
-  if (Array.isArray(d.items)) {
-    items = d.items;
-  } else {
-    const old = [...(d.books || []), ...(d.courses || [])];
-    items = old.map(i => ({ id: i.id, title: i.title, status: i.status, addedAt: i.addedAt }));
-  }
+  const items = Array.isArray(d.items) ? d.items : [];
   items.forEach(i => {
     if (i.status === 'active') i.status = 'progress';
     if (!Array.isArray(i.tags)) i.tags = [];
@@ -168,7 +163,8 @@ function cancelTagEdit() {
   render();
 }
 
-const isTouch = () => window.matchMedia('(hover: none)').matches;
+const _touchQuery = window.matchMedia('(hover: none)');
+const isTouch = () => _touchQuery.matches;
 
 
 function startTitleEdit(id) {
@@ -274,25 +270,17 @@ function deleteItem(id) {
   render();
 }
 
-function confirmDelete(btn, id) {
-  if (btn.dataset.pending === '1') {
+function confirmDelete(id) {
+  if (deletePendingId === id) {
+    deletePendingId = null;
     deleteItem(id);
   } else {
-    btn.dataset.pending = '1';
-    btn.textContent = '×?';
-    btn.style.color = '#e03e3e';
-    btn.style.width = 'auto';
-    btn.style.padding = '0 6px';
-    const itemEl = btn.closest('.item');
-    itemEl?.classList.add('del-pending');
+    deletePendingId = id;
+    render();
     setTimeout(() => {
-      if (btn.dataset.pending === '1') {
-        btn.dataset.pending = '';
-        btn.textContent = '×';
-        btn.style.color = '';
-        btn.style.width = '';
-        btn.style.padding = '';
-        itemEl?.classList.remove('del-pending');
+      if (deletePendingId === id) {
+        deletePendingId = null;
+        render();
       }
     }, 3000);
   }
@@ -519,7 +507,7 @@ function itemHTML(item) {
        </div>`;
 
   return `
-    <div class="item" data-id="${item.id}"
+    <div class="item${deletePendingId === item.id ? ' del-pending' : ''}" data-id="${item.id}"
          ondragover="onDragOver(event,'${item.id}')"
          ondragleave="onDragLeave(event)"
          ondrop="onDrop(event,'${item.id}')"
@@ -536,7 +524,7 @@ function itemHTML(item) {
       ${editingTagsFor === item.id || editingTitleFor === item.id ? '' : `<div class="item-btns">
         <button class="btn-title-edit" onclick="startTitleEdit('${item.id}')">✎</button>
         <button class="btn-tag-edit" onclick="startTagEdit('${item.id}')">#</button>
-        <button class="item-del" onclick="confirmDelete(this,'${item.id}')">×</button>
+        <button class="item-del${deletePendingId === item.id ? ' pending' : ''}" onclick="confirmDelete('${item.id}')">${deletePendingId === item.id ? '×?' : '×'}</button>
       </div>`}
     </div>`;
 }
@@ -798,6 +786,13 @@ document.addEventListener('click', e => {
     touchSelId = id;
     item.classList.add('touch-sel');
   }
+});
+
+document.addEventListener('click', e => {
+  if (!deletePendingId) return;
+  if (e.target.closest(`.item[data-id="${deletePendingId}"]`)) return;
+  deletePendingId = null;
+  render();
 });
 
 if ('serviceWorker' in navigator) {
