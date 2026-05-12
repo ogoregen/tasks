@@ -581,7 +581,7 @@ function addFormHTML() {
 }
 
 function render() {
-  const title = (config && config.title) || 'Dashboard';
+  const title = (config && config.title) || 'Tasks';
   document.title = title;
   document.getElementById('app').innerHTML = `
     <header>
@@ -671,7 +671,7 @@ function cancelAdd() {
 
 function showSetup() {
   const c = config || {};
-  const title = c.title || 'Dashboard';
+  const title = c.title || 'Tasks';
   document.title = title;
   document.getElementById('app').innerHTML = `
     <header>
@@ -750,7 +750,7 @@ async function saveSetup() {
     return;
   }
 
-  config = { pat, owner, repo, title: titleVal || 'Dashboard' };
+  config = { pat, owner, repo, title: titleVal || 'Tasks' };
   localStorage.setItem(CFG_KEY, JSON.stringify(config));
   await init();
 }

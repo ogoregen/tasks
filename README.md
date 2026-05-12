@@ -1,4 +1,4 @@
-# Dashboard
+# Tasks
 
 A minimal personal task tracker that syncs to a private GitHub repository. Supports tag filtering, drag-and-drop reordering, and installs as a PWA.
 

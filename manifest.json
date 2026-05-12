@@ -1,6 +1,6 @@
 {
-  "name": "Dashboard",
-  "short_name": "Dashboard",
+  "name": "Tasks",
+  "short_name": "Tasks",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#fff",
