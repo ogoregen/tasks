@@ -691,7 +691,7 @@ function showSetup() {
       </p>
       <div class="field">
         <label class="field-label" for="s-title">Title</label>
-        <input id="s-title" type="text" value="${esc(c.title || '')}" placeholder="Dashboard">
+        <input id="s-title" type="text" value="${esc(c.title || '')}" placeholder="Tasks">
       </div>
       <div class="field">
         <label class="field-label" for="s-pat">GitHub PAT</label>
