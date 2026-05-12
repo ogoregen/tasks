@@ -1,6 +1,7 @@
 'use strict';
 
-const CFG_KEY = 'db_config';
+const CFG_KEY        = 'db_config';
+const LOCAL_DATA_KEY = 'local_data';
 
 const STATUSES     = ['progress', 'backlog', 'want', 'done'];
 const ADD_STATUSES = ['progress', 'backlog', 'want'];
@@ -86,6 +87,12 @@ async function ghLoad() {
 }
 
 async function ghSave(action = 'update') {
+  if (config && config.local) {
+    if (JSON.stringify(data) === savedSnapshot) return;
+    localStorage.setItem(LOCAL_DATA_KEY, JSON.stringify(data));
+    savedSnapshot = JSON.stringify(data);
+    return;
+  }
   if (JSON.stringify(data) === savedSnapshot) return;
   if (isSaving) { needsSave = true; return; }
   isSaving = true;
@@ -644,6 +651,7 @@ function render() {
   if (touchSelId) {
     document.querySelector(`.item[data-id="${touchSelId}"]`)?.classList.add('touch-sel');
   }
+  if (config && config.local) syncMsg('Local');
   checkTruncation();
 }
 
@@ -707,7 +715,7 @@ function showSetup() {
       </div>
       <div class="setup-btns">
         <button class="btn-connect" onclick="saveSetup()">Save</button>
-        ${config ? `<button class="btn-back" onclick="render()">Cancel</button>` : ''}
+        ${config ? `<button class="btn-back" onclick="render()">Cancel</button>` : `<button class="btn-back" onclick="useLocally()">Use locally</button>`}
       </div>
       <div class="setup-msg" id="setup-msg"></div>
     </div>
@@ -755,6 +763,16 @@ async function saveSetup() {
   await init();
 }
 
+function useLocally() {
+  const titleVal = (document.getElementById('s-title')?.value || '').trim();
+  config = { local: true, title: titleVal || 'Tasks' };
+  localStorage.setItem(CFG_KEY, JSON.stringify(config));
+  const raw = localStorage.getItem(LOCAL_DATA_KEY);
+  data = raw ? normalize(JSON.parse(raw)) : { items: [] };
+  savedSnapshot = JSON.stringify(data);
+  render();
+}
+
 // ── Init ─────────────────────────────────────────────────────
 
 async function init() {
@@ -762,6 +780,14 @@ async function init() {
   activeTag = localStorage.getItem('activeTag') || null;
 
   if (!config) { showSetup(); return; }
+
+  if (config.local) {
+    const raw = localStorage.getItem(LOCAL_DATA_KEY);
+    data = raw ? normalize(JSON.parse(raw)) : { items: [] };
+    savedSnapshot = JSON.stringify(data);
+    render();
+    return;
+  }
 
   document.getElementById('app').innerHTML = '<div class="content"><div class="loading">Loading…</div></div>';
 
