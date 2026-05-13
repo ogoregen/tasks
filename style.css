@@ -600,9 +600,7 @@ header {
   .item-btns, .drag-handle { display: none; }
   .item.touch-sel .item-btns { display: flex; }
   .item.touch-sel .drag-handle { display: inline-flex; position: static; transform: none; top: auto; }
-  .item.touch-sel { touch-action: none; background: rgba(55,53,47,0.04); }
-  .item-del, .btn-title-edit, .btn-tag-edit, .btn-title-done, .btn-tag-save { width: 44px; height: 44px; background: rgba(55,53,47,0.04); border-radius: 4px; }
-  .drag-handle { width: 44px; height: 44px; align-self: center; align-items: center; justify-content: center; }
+  .item.touch-sel { touch-action: none; }
 }
 
 .tag-edit-wrap {
